@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Storage;
 
 class Drug extends Model
 {
@@ -19,6 +20,8 @@ class Drug extends Model
         'packaging_types',
         'image_path',
     ];
+
+    const DRUG_IMAGE_PATH = 'images/drugs';
 
     /**
      * The attributes that should be cast.
@@ -39,9 +42,26 @@ class Drug extends Model
     protected static function boot()
     {
         parent::boot();
+
         static::creating(function ($drug) {
             if (empty($drug->barcode)) {
                 $drug->barcode = self::generateBarcode();
+            }
+        });
+
+        static::updating(function ($drug) {
+            // cek apakah kolom profile_image berubah
+            if ($drug->isDirty('image_path')) {
+                $oldImage = $drug->getOriginal('image_path');
+                if ($oldImage && Storage::exists($oldImage)) {
+                    Storage::delete($oldImage);
+                }
+            }
+        });
+
+        static::deleting(function ($drug) {
+            if (Storage::exists($drug->image_path)) {
+                Storage::delete($drug->image_path);
             }
         });
     }
@@ -51,7 +71,7 @@ class Drug extends Model
      */
     public function getImageUrlAttribute()
     {
-        return $this->image_path ? asset('storage/' . $this->image_path) : asset('images/default-drug.png');
+        return $this->image_path && Storage::exists($this->image_path) ? asset('storage/' . $this->image_path) : asset('images/default-drug.png');
     }
 
     public function getProfitAttribute()

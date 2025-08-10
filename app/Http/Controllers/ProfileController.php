@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
 use App\Traits\StoreBase64Image;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -26,9 +27,10 @@ class ProfileController extends Controller
             'profile_img_base64' => 'nullable|string',
         ]);
 
-        $dataValidated['profile_image'] = $this->storeBase64Image('images/users', $request->profile_img_base64);
+        $dataValidated['profile_image'] = $this->storeBase64Image(User::PROFILE_IMAGE_PATH, $request->profile_img_base64);
 
         $user = \App\Models\User::find(Auth::id());
+        
         foreach ($dataValidated as $key => $value) {
             if ($key === 'profile_img_base64') {
                 continue; // skip profile_img_base64
