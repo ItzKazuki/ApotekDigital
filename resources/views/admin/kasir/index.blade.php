@@ -34,6 +34,7 @@
         <table class="min-w-full divide-y divide-gray-200">
             <thead class="bg-gray-50">
                 <tr>
+                    <th class="px-6 py-3 text-left text-sm font-semibold text-gray-600">Foto Profile</th>
                     <th class="px-6 py-3 text-left text-sm font-semibold text-gray-600">Nama</th>
                     <th class="px-6 py-3 text-left text-sm font-semibold text-gray-600">Email</th>
                     <th class="px-6 py-3 text-left text-sm font-semibold text-gray-600">Telepon</th>
@@ -44,6 +45,10 @@
             <tbody class="bg-white divide-y divide-gray-200">
                 @forelse ($kasir as $user)
                     <tr>
+                        <td class="px-6 py-4 text-sm text-gray-700">
+                            <img src="{{ $user->profile_image_url }}" alt="Logo"
+                                class="h-15 w-15 object-cover rounded-full">
+                        </td>
                         <td class="px-6 py-4 text-sm text-gray-700">{{ $user->name }}</td>
                         <td class="px-6 py-4 text-sm text-gray-700">{{ $user->email }}</td>
                         <td class="px-6 py-4 text-sm text-gray-700">{{ $user->phone }}</td>
