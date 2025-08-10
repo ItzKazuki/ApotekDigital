@@ -659,22 +659,23 @@
 
                     document.getElementById('phoneNumberMemberLabel').innerHTML =
                         `Member (${member.name})
-                    <span class="text-xs text-gray-400">point: ${parseInt(member.point)}</span>
-                    <span class="relative group inline-block align-middle ml-1">
-                        <!-- Ikon Info -->
-                        <svg xmlns="http://www.w3.org/2000/svg"
-                            class="h-4 w-4 text-gray-500 cursor-pointer inline-block"
-                            fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M13 16h-1v-4h-1m1-4h.01M12 2a10 10 0 100 20 10 10 0 000-20z" />
-                        </svg>
+                        <span class="text-xs text-gray-400">point: ${parseInt(member.point)}</span>
+                        <span class="relative group inline-block align-middle ml-1">
+                            <!-- Ikon Info -->
+                            <svg xmlns="http://www.w3.org/2000/svg"
+                                class="h-4 w-4 text-gray-500 cursor-pointer inline-block"
+                                fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M13 16h-1v-4h-1m1-4h.01M12 2a10 10 0 100 20 10 10 0 000-20z" />
+                            </svg>
 
-                        <!-- Tooltip -->
-                        <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 hidden group-hover:block
-                                    bg-gray-800 text-white text-xs px-2 py-1 rounded shadow z-10 whitespace-nowrap">
-                            Kadaluarsa pada ${new Date(member.expires_at).toLocaleDateString('id-ID')}
-                        </div>
-                    </span>`;
+                            <!-- Tooltip -->
+                            <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 hidden group-hover:block
+                                        bg-gray-800 text-white text-xs px-2 py-1 rounded shadow z-10 whitespace-nowrap">
+                                Kadaluarsa pada ${new Date(member.expires_at).toLocaleDateString('id-ID')}
+                            </div>
+                        </span>
+                    `;
 
                 } else {
                     Swal.fire({
