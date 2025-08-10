@@ -43,7 +43,7 @@
             </select>
             <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">Filter</button>
             <div class="md:ml-auto">
-                <button id="openAddModal" class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700">Tambah
+                <button type="button" id="openAddModal" class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700">Tambah
                     Kasir</button>
             </div>
         </form>
