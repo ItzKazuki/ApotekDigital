@@ -42,7 +42,7 @@
                 class="flex flex-col items-center justify-center w-20 h-20 rounded-full overflow-hidden shrink-0 mb-8">
                 <img alt="Profile photo of user, circular" class="w-full h-full object-cover" height="80"
                     loading="lazy"
-                    src="{{ auth()->user()->profile_image_url ? auth()->user()->profile_image_url : Avatar::create(auth()->user()->name)->toBase64() }}"
+                    src="{{ auth()->user()->profile_image_url }}"
                     width="80" />
             </a>
             <a href="{{ route('kasir.index') }}" aria-label="Menu"

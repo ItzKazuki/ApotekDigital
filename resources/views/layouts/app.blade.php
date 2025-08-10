@@ -45,7 +45,7 @@
 
             <a href="{{ route('admin.profile') }}" class="block">
                 <div class="flex items-center p-4 border-b border-gray-700 hover:bg-gray-800 cursor-pointer">
-                    <img src="{{ Auth::user()->profile_image_url ? Auth::user()->profile_image_url : Avatar::create(auth()->user()->name)->toBase64() }}"
+                    <img src="{{ Auth::user()->profile_image_url }}"
                         alt="Profile" class="w-12 h-12 rounded-full mr-2">
                     <div>
                         <div class="text-sm font-semibold">{{ Auth::user()->name }}</div>

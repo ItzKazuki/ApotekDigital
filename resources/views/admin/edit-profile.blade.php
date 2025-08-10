@@ -37,7 +37,7 @@
         <div class="flex flex-col md:flex-row md:items-center md:space-x-6">
             <div class="flex-shrink-0 mb-4 md:mb-0" id="previewProfileContainer">
                 <img id="previewProfile" alt="User profile photo" class="w-24 h-24 rounded-full object-cover"
-                    src="{{ $user->profile_image_url ? $user->profile_image_url : Avatar::create($user->name)->toBase64() }}" />
+                    src="{{ $user->profile_image_url }}" />
             </div>
             <div>
                 <label class="block text-sm font-semibold text-gray-700 mb-1" for="inputImageProfile">
