@@ -21,7 +21,7 @@
         <!-- Jumlah Transaksi -->
         <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-200">
             <div class="flex items-center justify-between mb-3">
-                <span class="text-gray-500 text-sm font-medium">Jumlah Transaksi</span>
+                <span class="text-gray-500 text-sm font-medium">Total Seluruh Transaksi</span>
                 <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" stroke-width="2"
                     viewBox="0 0 24 24">
                     <path d="M9 17v-6h13V7H9V1L2 10l7 9z" stroke-linecap="round" stroke-linejoin="round" />
