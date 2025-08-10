@@ -1,103 +1,107 @@
 @extends('layouts.app')
 
 @section('content')
-    <h1 class="text-2xl font-semibold text-gray-700 mb-4">Daftar Obat-Obatan</h1>
+    <div class="container mx-auto p-6">
+        <h1 class="text-4xl font-semibold text-gray-700 mb-4">Daftar Obat-Obatan</h1>
 
-    <!-- Alert sukses/error -->
-    @if (session('success'))
-        <div class="mb-4 px-4 py-2 bg-green-100 text-green-800 rounded">
-            {{ session('success') }}
-        </div>
-    @endif
-    @if (session('error'))
-        <div class="mb-4 px-4 py-2 bg-red-100 text-red-800 rounded">
-            {{ session('error') }}
-        </div>
-    @endif
+        <!-- Alert sukses/error -->
+        @if (session('success'))
+            <div class="mb-4 px-4 py-2 bg-green-100 text-green-800 rounded">
+                {{ session('success') }}
+            </div>
+        @endif
+        @if (session('error'))
+            <div class="mb-4 px-4 py-2 bg-red-100 text-red-800 rounded">
+                {{ session('error') }}
+            </div>
+        @endif
 
-    @if ($errors->any())
-        <div class="mb-4 px-4 py-2 bg-red-100 text-red-800 rounded">
-            <ul>
-                @foreach ($errors->all() as $error)
-                    <li>{{ $error }}</li>
+        @if ($errors->any())
+            <div class="mb-4 px-4 py-2 bg-red-100 text-red-800 rounded">
+                <ul>
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
+
+        <!-- Filter -->
+        <form method="GET" action="{{ route('admin.drug.index') }}"
+            class="flex flex-col md:flex-row md:items-center md:space-x-4 space-y-2 md:space-y-0 mb-4">
+            <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari nama produk..."
+                class="w-full md:w-1/3 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400" />
+            <select name="category"
+                class="w-full md:w-1/4 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400">
+                <option value="">Semua Kategori</option>
+                @foreach ($categories as $cat)
+                    <option value="{{ $cat->id }}" {{ request('category') == $cat->id ? 'selected' : '' }}>
+                        {{ $cat->name }}</option>
                 @endforeach
-            </ul>
-        </div>
-    @endif
+            </select>
+            <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">Filter</button>
+            <div class="md:ml-auto">
+                <button type="button" id="openAddModal"
+                    class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700">Tambah Obat</button>
+            </div>
+        </form>
 
-    <!-- Filter -->
-    <form method="GET" action="{{ route('admin.drug.index') }}"
-        class="flex flex-col md:flex-row md:items-center md:space-x-4 space-y-2 md:space-y-0 mb-4">
-        <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari nama produk..."
-            class="w-full md:w-1/3 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400" />
-        <select name="category"
-            class="w-full md:w-1/4 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400">
-            <option value="">Semua Kategori</option>
-            @foreach ($categories as $cat)
-                <option value="{{ $cat->id }}" {{ request('category') == $cat->id ? 'selected' : '' }}>
-                    {{ $cat->name }}</option>
-            @endforeach
-        </select>
-        <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">Filter</button>
-        <div class="md:ml-auto">
-            <button type="button" id="openAddModal"
-                class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700">Tambah Obat</button>
+        <!-- Tabel Produk -->
+        <div class="overflow-x-auto bg-white rounded-xl shadow border border-gray-200">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-sm font-semibold text-gray-600">Nama Produk</th>
+                        <th class="px-6 py-3 text-left text-sm font-semibold text-gray-600">Gambar</th>
+                        <th class="px-6 py-3 text-left text-sm font-semibold text-gray-600">Harga</th>
+                        <th class="px-6 py-3 text-left text-sm font-semibold text-gray-600">Modal</th>
+                        <th class="px-6 py-3 text-left text-sm font-semibold text-gray-600">Kategori</th>
+                        <th class="px-6 py-3 text-left text-sm font-semibold text-gray-600">Stok</th>
+                        <th class="px-6 py-3 text-left text-sm font-semibold text-gray-600">Tanggal Exp</th>
+                        <th class="px-6 py-3 text-left text-sm font-semibold text-gray-600">Jenis Kemasan</th>
+                        <th class="px-6 py-3 text-left text-sm font-semibold text-gray-600">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    @forelse ($drugs as $drug)
+                        <tr>
+                            <td class="px-6 py-4 text-sm text-gray-700">{{ $drug->name }}</td>
+                            <td class="px-6 py-4 text-sm text-gray-700">
+                                @if ($drug->image_path)
+                                    <img src="{{ asset('storage/' . $drug->image_path) }}" alt="Logo"
+                                        class="h-10 w-10 object-cover rounded">
+                                @else
+                                    <span class="text-gray-400">-</span>
+                                @endif
+                            </td>
+                            <td class="px-6 py-4 text-sm text-gray-700">Rp. {{ number_format($drug->price, 0, ',', '.') }}
+                            </td>
+                            <td class="px-6 py-4 text-sm text-gray-700">Rp. {{ number_format($drug->modal, 0, ',', '.') }}
+                            </td>
+                            <td class="px-6 py-4 text-sm text-gray-700">{{ $drug->category ? $drug->category->name : '-' }}
+                            </td>
+                            <td class="px-6 py-4 text-sm text-gray-700">{{ $drug->stock }}</td>
+                            <td class="px-6 py-4 text-sm text-gray-700">{{ $drug->expired_at }}</td>
+                            <td class="px-6 py-4 text-sm text-gray-700">{{ $drug->packaging_types }}</td>
+                            <td class="px-6 py-4 space-x-2">
+                                <button class="px-3 py-1 bg-yellow-400 text-white rounded hover:bg-yellow-500 text-sm"
+                                    onclick='openEditModal(@json($drug))'>Edit</button>
+                                <button onclick="showBarcodeModal('{{ $drug->barcode }}')"
+                                    class="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 text-sm">Barcode</button>
+                                <button class="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600 text-sm"
+                                    onclick="openDeleteModal({{ $drug->id }}, '{{ addslashes($drug->name) }}')">Delete</button>
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="9" class="px-6 py-4 text-center text-sm text-gray-500">
+                                Tidak ada obat yang ditemukan.
+                            </td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
         </div>
-    </form>
-
-    <!-- Tabel Produk -->
-    <div class="overflow-x-auto bg-white rounded-xl shadow border border-gray-200">
-        <table class="min-w-full divide-y divide-gray-200">
-            <thead class="bg-gray-50">
-                <tr>
-                    <th class="px-6 py-3 text-left text-sm font-semibold text-gray-600">Nama Produk</th>
-                    <th class="px-6 py-3 text-left text-sm font-semibold text-gray-600">Gambar</th>
-                    <th class="px-6 py-3 text-left text-sm font-semibold text-gray-600">Harga</th>
-                    <th class="px-6 py-3 text-left text-sm font-semibold text-gray-600">Modal</th>
-                    <th class="px-6 py-3 text-left text-sm font-semibold text-gray-600">Kategori</th>
-                    <th class="px-6 py-3 text-left text-sm font-semibold text-gray-600">Stok</th>
-                    <th class="px-6 py-3 text-left text-sm font-semibold text-gray-600">Tanggal Exp</th>
-                    <th class="px-6 py-3 text-left text-sm font-semibold text-gray-600">Jenis Kemasan</th>
-                    <th class="px-6 py-3 text-left text-sm font-semibold text-gray-600">Aksi</th>
-                </tr>
-            </thead>
-            <tbody class="bg-white divide-y divide-gray-200">
-                @forelse ($drugs as $drug)
-                    <tr>
-                        <td class="px-6 py-4 text-sm text-gray-700">{{ $drug->name }}</td>
-                        <td class="px-6 py-4 text-sm text-gray-700">
-                            @if ($drug->image_path)
-                                <img src="{{ asset('storage/' . $drug->image_path) }}" alt="Logo"
-                                    class="h-10 w-10 object-cover rounded">
-                            @else
-                                <span class="text-gray-400">-</span>
-                            @endif
-                        </td>
-                        <td class="px-6 py-4 text-sm text-gray-700">Rp. {{ number_format($drug->price, 0, ',', '.') }}</td>
-                        <td class="px-6 py-4 text-sm text-gray-700">Rp. {{ number_format($drug->modal, 0, ',', '.') }}</td>
-                        <td class="px-6 py-4 text-sm text-gray-700">{{ $drug->category ? $drug->category->name : '-' }}
-                        </td>
-                        <td class="px-6 py-4 text-sm text-gray-700">{{ $drug->stock }}</td>
-                        <td class="px-6 py-4 text-sm text-gray-700">{{ $drug->expired_at }}</td>
-                        <td class="px-6 py-4 text-sm text-gray-700">{{ $drug->packaging_types }}</td>
-                        <td class="px-6 py-4 space-x-2">
-                            <button class="px-3 py-1 bg-yellow-400 text-white rounded hover:bg-yellow-500 text-sm"
-                                onclick='openEditModal(@json($drug))'>Edit</button>
-                            <button onclick="showBarcodeModal('{{ $drug->barcode }}')"
-                                class="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 text-sm">Barcode</button>
-                            <button class="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600 text-sm"
-                                onclick="openDeleteModal({{ $drug->id }}, '{{ addslashes($drug->name) }}')">Delete</button>
-                        </td>
-                    </tr>
-                @empty
-                    <tr>
-                        <td colspan="9" class="px-6 py-4 text-center text-sm text-gray-500">
-                            Tidak ada obat yang ditemukan.
-                        </td>
-                    </tr>
-                @endforelse
-            </tbody>
-        </table>
     </div>
 @endsection
 

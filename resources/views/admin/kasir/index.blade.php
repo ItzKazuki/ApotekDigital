@@ -1,79 +1,81 @@
 @extends('layouts.app')
 
 @section('content')
-    <h1 class="text-2xl font-semibold text-gray-700 mb-4">Daftar kasir</h1>
+    <div class="container mx-auto p-6">
+        <h1 class="text-4xl font-semibold text-gray-700 mb-4">Daftar Kasir</h1>
 
-    <!-- Alert sukses/error -->
-    @if (session('success'))
-        <div class="mb-4 px-4 py-2 bg-green-100 text-green-800 rounded">
-            {{ session('success') }}
+        <!-- Alert sukses/error -->
+        @if (session('success'))
+            <div class="mb-4 px-4 py-2 bg-green-100 text-green-800 rounded">
+                {{ session('success') }}
+            </div>
+        @endif
+        @if (session('error'))
+            <div class="mb-4 px-4 py-2 bg-red-100 text-red-800 rounded">
+                {{ session('error') }}
+            </div>
+        @endif
+
+        @if ($errors->any())
+            <div class="mb-4 px-4 py-2 bg-red-100 text-red-800 rounded">
+                <ul>
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
+
+        <div class="flex justify-end mb-4">
+            <button id="openAddModal" class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700">Tambah
+                Kasir</button>
         </div>
-    @endif
-    @if (session('error'))
-        <div class="mb-4 px-4 py-2 bg-red-100 text-red-800 rounded">
-            {{ session('error') }}
-        </div>
-    @endif
 
-    @if ($errors->any())
-        <div class="mb-4 px-4 py-2 bg-red-100 text-red-800 rounded">
-            <ul>
-                @foreach ($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                @endforeach
-            </ul>
-        </div>
-    @endif
-
-    <div class="flex justify-end mb-4">
-        <button id="openAddModal" class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700">Tambah
-            Kasir</button>
-    </div>
-
-    <div class="overflow-x-auto bg-white rounded-xl shadow border border-gray-200">
-        <table class="min-w-full divide-y divide-gray-200">
-            <thead class="bg-gray-50">
-                <tr>
-                    <th class="px-6 py-3 text-left text-sm font-semibold text-gray-600">Foto Profile</th>
-                    <th class="px-6 py-3 text-left text-sm font-semibold text-gray-600">Nama</th>
-                    <th class="px-6 py-3 text-left text-sm font-semibold text-gray-600">Email</th>
-                    <th class="px-6 py-3 text-left text-sm font-semibold text-gray-600">Telepon</th>
-                    <th class="px-6 py-3 text-left text-sm font-semibold text-gray-600">Status</th>
-                    <th class="px-6 py-3 text-left text-sm font-semibold text-gray-600">Aksi</th>
-                </tr>
-            </thead>
-            <tbody class="bg-white divide-y divide-gray-200">
-                @forelse ($kasir as $user)
+        <div class="overflow-x-auto bg-white rounded-xl shadow border border-gray-200">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
                     <tr>
-                        <td class="px-6 py-4 text-sm text-gray-700">
-                            <img src="{{ $user->profile_image_url }}" alt="Logo"
-                                class="h-15 w-15 object-cover rounded-full">
-                        </td>
-                        <td class="px-6 py-4 text-sm text-gray-700">{{ $user->name }}</td>
-                        <td class="px-6 py-4 text-sm text-gray-700">{{ $user->email }}</td>
-                        <td class="px-6 py-4 text-sm text-gray-700">{{ $user->phone }}</td>
-                        <td class="px-6 py-4 text-sm text-gray-700">
-                            <p
-                                class="inline-flex rounded-full bg-opacity-10 px-3 py-1 text-sm font-medium {{ $user->is_logged_in ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-600' }}">
-                                {{ $user->is_logged_in ? 'Online' : 'Offline' }}
-                            </p>
-                        </td>
-                        <td class="px-6 py-4 space-x-2">
-                            <button class="px-3 py-1 bg-yellow-400 text-white rounded hover:bg-yellow-500 text-sm"
-                                onclick='openEditModal(@json($user))'>Edit</button>
-                            <button class="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600 text-sm"
-                                onclick="openDeleteModal({{ $user->id }}, '{{ addslashes($user->name) }}')">Delete</button>
-                        </td>
+                        <th class="px-6 py-3 text-left text-sm font-semibold text-gray-600">Foto Profile</th>
+                        <th class="px-6 py-3 text-left text-sm font-semibold text-gray-600">Nama</th>
+                        <th class="px-6 py-3 text-left text-sm font-semibold text-gray-600">Email</th>
+                        <th class="px-6 py-3 text-left text-sm font-semibold text-gray-600">Telepon</th>
+                        <th class="px-6 py-3 text-left text-sm font-semibold text-gray-600">Status</th>
+                        <th class="px-6 py-3 text-left text-sm font-semibold text-gray-600">Aksi</th>
                     </tr>
-                @empty
-                    <tr>
-                        <td colspan="5" class="px-6 py-4 text-center text-sm text-gray-500">
-                            Tidak ada kasir yang ditemukan.
-                        </td>
-                    </tr>
-                @endforelse
-            </tbody>
-        </table>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    @forelse ($kasir as $user)
+                        <tr>
+                            <td class="px-6 py-4 text-sm text-gray-700">
+                                <img src="{{ $user->profile_image_url }}" alt="Logo"
+                                    class="h-15 w-15 object-cover rounded-full">
+                            </td>
+                            <td class="px-6 py-4 text-sm text-gray-700">{{ $user->name }}</td>
+                            <td class="px-6 py-4 text-sm text-gray-700">{{ $user->email }}</td>
+                            <td class="px-6 py-4 text-sm text-gray-700">{{ $user->phone }}</td>
+                            <td class="px-6 py-4 text-sm text-gray-700">
+                                <p
+                                    class="inline-flex rounded-full bg-opacity-10 px-3 py-1 text-sm font-medium {{ $user->is_logged_in ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-600' }}">
+                                    {{ $user->is_logged_in ? 'Online' : 'Offline' }}
+                                </p>
+                            </td>
+                            <td class="px-6 py-4 space-x-2">
+                                <button class="px-3 py-1 bg-yellow-400 text-white rounded hover:bg-yellow-500 text-sm"
+                                    onclick='openEditModal(@json($user))'>Edit</button>
+                                <button class="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600 text-sm"
+                                    onclick="openDeleteModal({{ $user->id }}, '{{ addslashes($user->name) }}')">Delete</button>
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="5" class="px-6 py-4 text-center text-sm text-gray-500">
+                                Tidak ada kasir yang ditemukan.
+                            </td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
     </div>
 @endsection
 

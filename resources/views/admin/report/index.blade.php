@@ -2,7 +2,7 @@
 
 @section('content')
     <div class="container mx-auto p-6">
-        <h1 class="text-3xl font-semibold mb-6">Laporan Penjualan</h1>
+        <h1 class="text-4xl font-semibold mb-6">Laporan Penjualan</h1>
 
         {{-- Filter Tanggal --}}
         <form method="GET" class="mb-6 flex space-x-4">
@@ -17,7 +17,6 @@
                 <i class="fas fa-file-pdf"></i>
                 Download PDF
             </a>
-
 
         </form>
 
