@@ -4,15 +4,18 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 
+use App\Traits\StoreBase64Image;
+use Laravolt\Avatar\Facade as Avatar;
+use Illuminate\Notifications\Notifiable;
 use App\Notifications\ResetPasswordNotification;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Storage;
 
 class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable;
+    use HasFactory, Notifiable, StoreBase64Image;
 
     /**
      * The attributes that are mass assignable.
@@ -28,6 +31,8 @@ class User extends Authenticatable
         'is_logged_in',
         'profile_image',
     ];
+
+    const PROFILE_IMAGE_PATH = 'images/users';
 
     /**
      * The attributes that should be hidden for serialization.
@@ -52,6 +57,34 @@ class User extends Authenticatable
         ];
     }
 
+    // prevent avatar called many time.
+    protected static function boot()
+    {
+        parent::boot();
+        
+        static::creating(function ($user) {
+            if (empty($user->profile_image)) {
+                $user->profile_image = $user->storeBase64Image(self::PROFILE_IMAGE_PATH,  Avatar::create($user->name)->toBase64());
+            }
+        });
+
+        static::updating(function ($user) {
+            // cek apakah kolom profile_image berubah
+            if ($user->isDirty('profile_image')) {
+                $oldImage = $user->getOriginal('profile_image');
+                if ($oldImage && Storage::exists($oldImage)) {
+                    Storage::delete($oldImage);
+                }
+            }
+        });
+
+        static::deleting(function ($user) {
+            if (Storage::exists($user->profile_image)) {
+                Storage::delete($user->profile_image);
+            }
+        });
+    }
+
     /**
      * Send a password reset notification to the user.
      *
@@ -67,7 +100,7 @@ class User extends Authenticatable
      */
     public function getProfileImageUrlAttribute(): string | null
     {
-        return $this->profile_image ? asset('storage/' . $this->profile_image) : null;
+        return $this->profile_image && Storage::exists($this->profile_image) ? asset('storage/' . $this->profile_image) : Avatar::create($this->name)->toBase64();
     }
 
     /**
