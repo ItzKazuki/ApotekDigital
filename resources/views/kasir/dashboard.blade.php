@@ -42,8 +42,8 @@
         </h2>
     </div>
     <!-- Menu Items Grid -->
-    <div class="overflow-y-auto" style="max-height: 600px;">
-        <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+    <div class="overflow-y-auto scrollbar-hidden" style="max-height: 600px;">
+        <section class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6">
             @forelse ($drugs as $drug)
                 @php
                     $expiredDate = Carbon::parse($drug->expired_at);
@@ -116,7 +116,7 @@
                     </button>
                 </article>
             @empty
-                <div class="col-span-full text-center text-gray-500 py-10">
+                <div class="col-span-full flex flex-col items-center justify-center py-10 text-gray-500">
                     <i class="fas fa-pills text-4xl mb-3"></i>
                     <p class="font-semibold">Obat tidak tersedia</p>
                 </div>
@@ -140,8 +140,7 @@
             </span>
         </h2>
 
-        <div class="bg-[#f9fafd] rounded-lg p-4 space-y-4 flex-1 overflow-y-auto max-h-[300px]" id="cartContainer"
-            style="">
+        <div class="bg-[#f9fafd] rounded-lg p-4 space-y-4 flex-1 overflow-y-auto max-h-[300px]" id="cartContainer">
         </div>
         <!-- Summary -->
         <div class="border border-gray-300 rounded-md p-4 text-sm text-gray-900 hidden" id="detailCartItems">
@@ -164,7 +163,7 @@
                 </div>
             @endif
         </div>
-        <div class="border border-gray-300 rounded-md p-4 font-extrabold text-lg flex justify-between" style="">
+        <div class="border border-gray-300 rounded-md p-4 font-extrabold text-lg flex justify-between">
             <span>
                 Total
             </span>
@@ -176,21 +175,21 @@
         <form class="space-y-4">
             <div class="flex gap-4">
                 <div class="w-1/2">
-                    <label class="block text-sm font-semibold mb-1" for="cashInput" style="">
-                        Uang Tunai
+                    <label class="block text-sm font-semibold mb-1" for="cashInput">
+                        Uang Tunai <span class="text-red-600">*</span>
                     </label>
                     <input
                         class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#f9d36b] focus:border-transparent"
                         id="cashInput" placeholder="Masukkan uang tunai" type="number" min="0" step="1000"
-                        style="" />
+                        required />
                 </div>
                 <div class="w-1/2">
                     <label class="block text-sm font-semibold mb-1 text-gray-900" for="metode-pembayaran">
-                        Metode Pembayaran
+                        Metode Pembayaran <span class="text-red-600">*</span>
                     </label>
                     <select
                         class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-yellow-400"
-                        id="metode-pembayaran" name="metode-pembayaran">
+                        id="metode-pembayaran" name="metode-pembayaran" required>
                         <option value="" disabled selected>
                             Pilih
                         </option>
@@ -201,15 +200,14 @@
                 </div>
             </div>
             <div>
-                <label class="block text-sm font-semibold mb-1" for="memberPhone" id="phoneNumberMemberLabel"
-                    style="">
+                <label class="block text-sm font-semibold mb-1" for="memberPhone" id="phoneNumberMemberLabel">
                     Member (Nomor Telepon)
                 </label>
                 <div class="flex">
                     <input
                         class="w-[70%] rounded-l-md border border-gray-300 px-3 py-2 text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#f9d36b] focus:border-transparent"
                         id="phoneNumberMember" placeholder="Masukkan nomor member" type="tel" pattern="[0-9]*"
-                        inputmode="numeric" style="" />
+                        inputmode="numeric" onkeydown="if(event.key==='Enter'){event.preventDefault();checkMember();}" />
                     <button type="button" onclick="checkMember()" id="searchMemberBtn"
                         class="w-[30%] flex items-center justify-center bg-[#f9d36b] border border-l-0 border-gray-300 rounded-r-md hover:bg-yellow-400">
                         <i class="fas fa-search text-gray-700"></i>
@@ -217,7 +215,7 @@
                 </div>
             </div>
             <div>
-                <label class="block text-sm font-semibold mb-1" for="changeOutput" style="">
+                <label class="block text-sm font-semibold mb-1" for="changeOutput">
                     Kembalian
                 </label>
                 <input
@@ -239,6 +237,8 @@
         let barcode = '';
         let scanTimeout;
         const allowedChars = /^[0-9A-Za-z\-\_]+$/; // karakter yang diizinkan
+        // Regex: mulai dari 08 + 8-11 digit angka setelahnya = total 10–13 digit
+        const phoneRegex = /^08\d{8,11}$/;
 
         // Example script to handle cash input and calculate change
         // onload get cart details dynamically
@@ -258,6 +258,17 @@
 
             if (e.key === 'Enter') {
                 if (barcode.length > 0) {
+                    // if barcode scan phone number for member
+                    // ✅ Cek apakah barcode adalah nomor telepon
+                    if (phoneRegex.test(barcode)) {
+                        // Set value input nomor telepon
+                        document.getElementById('phoneNumberMember').value = barcode;
+                        // Opsional: langsung trigger pencarian member
+                        checkMember();
+                        barcode = '';
+                        return; // Stop, jangan lanjut ke proses tambah produk
+                    }
+
                     axios.post("{{ route('kasir.cart.store.barcode') }}", {
                             barcode: barcode
                         }, {
@@ -382,8 +393,9 @@
             });
         }
 
-        document.getElementById('cashInput').addEventListener('input', function() {
-            const cash = parseFloat(this.value) || 0;
+        // uang masuk & kembalian logic
+        function hitungKembalian() {
+            const cash = parseFloat(document.getElementById('cashInput').value) || 0;
             const totalText = document.getElementById('totalPrice').innerText;
             const total = parseInt(totalText.replace(/[^\d]/g, ''), 10) || 0;
 
@@ -395,7 +407,20 @@
             } else {
                 changeOutput.value = `Kurang: Rp${Math.abs(difference).toLocaleString('id-ID')}`;
             }
+        }
+
+        // Jalankan ketika uang diinput
+        document.getElementById('cashInput').addEventListener('input', hitungKembalian);
+
+        // Pantau perubahan total harga
+        const target = document.getElementById('totalPrice');
+        const observer = new MutationObserver(hitungKembalian);
+        observer.observe(target, {
+            childList: true,
+            subtree: true,
+            characterData: true
         });
+        // end uang masuk & kembalian logic
 
         // cart functionality
         function addDrugToCart(drugId) {
@@ -457,10 +482,7 @@
                     const cartItems = Object.values(responseCartItems?.data?.cartItems || {});
 
                     // jika cart item nya 0 maka sembunyikan detailCartItems
-                    if (cartItems.length >= 1) {
-                        totalSection.innerHTML = `Rp${totalValue.toLocaleString('id-ID')}`;
-                        detailCartItems.classList.remove('hidden');
-                    } else {
+                    if (cartItems.length === 0) {
                         totalSection.innerHTML = `Rp0`;
                         detailCartItems.classList.add('hidden');
 
@@ -473,7 +495,19 @@
                                 'X-CSRF-TOKEN': '{{ csrf_token() }}'
                             }
                         }).catch(err => console.error('Error removing cart timeout:', err));
+
+                        // Tampilkan pesan keranjang kosong
+                        cartContainer.innerHTML = `
+                            <div class="flex flex-col items-center justify-center h-full text-gray-500">
+                                <i class="fas fa-shopping-cart text-4xl mb-3"></i>
+                                <p class="font-semibold">Keranjang kosong</p>
+                            </div>
+                        `;
+
+                        return; // stop eksekusi
                     }
+                    totalSection.innerHTML = `Rp${totalValue.toLocaleString('id-ID')}`;
+                    detailCartItems.classList.remove('hidden');
 
                     cartContainer.innerHTML = ''; // Clear the existing content
                     cartItems.forEach(item => {
