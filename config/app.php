@@ -149,4 +149,8 @@ return [
         'token' => env('FONNTE_WHATSAPP_TOKEN', ''),
         'phone_number' => env('FONNTE_WHATSAPP_NUMBER', '08123456789')
     ],
+
+    'struk' => [
+        'show_cashier_name' => env('SHOW_CASHIER_NAME', true)
+    ],
 ];

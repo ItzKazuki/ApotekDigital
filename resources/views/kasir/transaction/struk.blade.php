@@ -1,7 +1,17 @@
 <div id="receipt" class="receipt">
     <img src="{{ asset('static/images/logo-apotek-v2.png') }}" width="200" class="center" alt="">
-    <p>{{ config('app.address') }}</p>
-    <p>No. Telp {{ config('app.fonnte.phone_number') }}</p>
+    @if (config('app.address'))
+        <p>{{ config('app.address') }}</p>
+    @endif
+
+    @if (config('app.fonnte.phone_number'))
+        <p>No. Telp {{ config('app.fonnte.phone_number') }}</p>
+    @endif
+
+    @if (config('app.struk.show_cashier_name'))
+        <p>Kasir: {{ $transaction->kasir->name }}</p>
+    @endif
+
     <hr>
     <p>{{ \Carbon\Carbon::parse($transaction->transaction_date)->locale('id')->translatedFormat('l, d F Y H:i') }} WIB
     </p>
