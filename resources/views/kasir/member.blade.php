@@ -118,26 +118,26 @@
                 if (searchMemberResponse.data.success && member) {
                     // Display member card
                     resultsDiv.innerHTML = `
-                    <div class="member-card bg-gradient-to-br from-blue-600 to-indigo-700 rounded-2xl shadow-xl p-6 text-white w-full max-w-md mx-auto">
+                    <div class="member-card bg-gradient-to-br from-yellow-600 to-indigo-700 rounded-2xl shadow-xl p-6 text-white w-full max-w-md mx-auto">
                         <div class="flex justify-between items-center mb-6">
                             <div class="flex items-center space-x-2">
                                 <img src="{{ asset('static/images/logo-apotek-v2-darkmode.png') }}" alt="Logo" class="mx-auto h-15 w-auto">
                             </div>
-                            <span class="bg-blue-800 text-white px-3 py-1 rounded-full text-xs">${parseInt(member.point)} pts</span>
+                            <span class="bg-yellow-800 text-white px-3 py-1 rounded-full text-xs">${parseInt(member.point)} pts</span>
                         </div>
 
                         <div class="mb-6">
                             <h2 class="text-2xl font-bold mb-2">${member.name}</h2>
-                            <p class="text-blue-100">${member.phone}</p>
+                            <p class="text-yellow-100">${member.phone}</p>
                         </div>
 
                         <div class="flex justify-between items-center text-sm">
                             <div>
-                                <p class="text-blue-200">Sejak</p>
+                                <p class="text-yellow-200">Sejak</p>
                                 <p class="font-medium">${new Date(member.created_at).toLocaleDateString('id-ID')}</p>
                             </div>
                             <div class="text-right">
-                                <p class="text-blue-200">Kadaluarsa pada</p>
+                                <p class="text-yellow-200">Kadaluarsa pada</p>
                                 <p class="font-medium">${new Date(member.expires_at).toLocaleDateString('id-ID')}</p>
                             </div>
                         </div>
@@ -151,6 +151,14 @@
                     </div>
                 `;
                 }
+            }).catch(error => {
+                console.error(error);
+                // Display not found message
+                resultsDiv.innerHTML = `
+                    <div class="bg-white rounded-lg shadow p-6 text-center">
+                        <p class="text-gray-600">Member dengan nomor telepon tersebut tidak ditemukan.</p>
+                    </div>
+                `;
             })
         });
 
