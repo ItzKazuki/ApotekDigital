@@ -27,7 +27,8 @@
 
     <!-- Tombol tambah kategori -->
     <div class="flex justify-end mb-4">
-        <button id="openAddModal" class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700">Tambah Kategori</button>
+        <button id="openAddModal" class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700">Tambah
+            Kategori</button>
     </div>
 
     <!-- Tabel Kategori -->
@@ -39,7 +40,7 @@
                     <th class="px-6 py-3 text-left text-sm font-semibold text-gray-600">Logo Kategori</th>
                     <th class="px-6 py-3 text-left text-sm font-semibold text-gray-600">Nama Kategori</th>
                     <th class="px-6 py-3 text-left text-sm font-semibold text-gray-600">Deskripsi</th>
-                    <th class="px-6 py-3 text-left text-sm font-semibold text-gray-600">Jumlah  Obat</th>
+                    <th class="px-6 py-3 text-left text-sm font-semibold text-gray-600">Jumlah Obat</th>
                     <th class="px-6 py-3 text-left text-sm font-semibold text-gray-600">Aksi</th>
                 </tr>
             </thead>
@@ -48,8 +49,9 @@
                     <tr>
                         <td class="px-6 py-4 text-sm text-gray-700">{{ $category->id }}</td>
                         <td class="px-6 py-4 text-sm text-gray-700">
-                            @if($category->image_path)
-                                <img src="{{ asset('storage/' . $category->image_path) }}" alt="Logo" class="h-10 w-10 object-cover rounded">
+                            @if ($category->image_path)
+                                <img src="{{ asset('storage/' . $category->image_path) }}" alt="Logo"
+                                    class="h-10 w-10 object-cover rounded">
                             @else
                                 <span class="text-gray-400">-</span>
                             @endif
@@ -67,7 +69,7 @@
                 @endforeach
             </tbody>
         </table>
-                <div class="my-4">
+        <div class="my-4">
             @if ($categories->hasPages())
                 <nav class="flex justify-center">
                     <ul class="flex items-center space-x-1">
@@ -127,7 +129,8 @@
                 <input type="hidden" name="_method" id="formMethod" value="POST">
                 <input type="hidden" name="id" id="categoryId">
                 <div class="mb-4">
-                    <label class="block text-sm font-medium text-gray-700">Nama Kategori</label>
+                    <label class="block text-sm font-medium text-gray-700">Nama Kategori <span
+                            class="text-red-600">*</span></label>
                     <input type="text" name="name" id="categoryName"
                         class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
                         required />
@@ -138,7 +141,8 @@
                         class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"></textarea>
                 </div>
                 <div class="mb-4">
-                    <label class="block text-sm font-medium text-gray-700">Gambar</label>
+                    <label class="block text-sm font-medium text-gray-700">Gambar <span
+                            class="text-red-600">*</span></label>
                     <input type="file" name="image" id="categoryImage"
                         class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400" />
                 </div>
@@ -171,64 +175,65 @@
 @endpush
 
 @push('scripts')
-<script>
-    const addEditModal = document.getElementById("addEditModal");
-    const deleteModal = document.getElementById("deleteModal");
-    const closeAddEditModal = document.getElementById("closeAddEditModal");
-    const closeDeleteModal = document.getElementById("closeDeleteModal");
-    const cancelDelete = document.getElementById("cancelDelete");
-    const modalForm = document.getElementById("modalForm");
-    const deleteForm = document.getElementById("deleteForm");
+    <script>
+        const addEditModal = document.getElementById("addEditModal");
+        const deleteModal = document.getElementById("deleteModal");
+        const closeAddEditModal = document.getElementById("closeAddEditModal");
+        const closeDeleteModal = document.getElementById("closeDeleteModal");
+        const cancelDelete = document.getElementById("cancelDelete");
+        const modalForm = document.getElementById("modalForm");
+        const deleteForm = document.getElementById("deleteForm");
 
-    // Open Add Modal
-    document.getElementById("openAddModal").onclick = function() {
-        document.getElementById("modalTitle").innerText = "Tambah Kategori";
-        modalForm.action = "{{ route('admin.category.store') }}";
-        document.getElementById("formMethod").value = "POST";
-        document.getElementById("categoryId").value = "";
-        document.getElementById("categoryName").value = "";
-        document.getElementById("categoryDescription").value = "";
-        document.getElementById("categoryImage").value = "";
-        addEditModal.style.display = "block";
-    }
+        // Open Add Modal
+        document.getElementById("openAddModal").onclick = function() {
+            document.getElementById("modalTitle").innerText = "Tambah Kategori";
+            modalForm.action = "{{ route('admin.category.store') }}";
+            document.getElementById("formMethod").value = "POST";
+            document.getElementById("categoryId").value = "";
+            document.getElementById("categoryName").value = "";
+            document.getElementById("categoryDescription").value = "";
+            document.getElementById("categoryImage").value = "";
+            addEditModal.style.display = "block";
+        }
 
-    // Open Edit Modal
-    function openEditModal(category) {
-        document.getElementById("modalTitle").innerText = "Edit Kategori";
-        modalForm.action = "/admin/category/" + category.id;
-        document.getElementById("formMethod").value = "PUT";
-        document.getElementById("categoryId").value = category.id;
-        document.getElementById("categoryName").value = category.name || "";
-        document.getElementById("categoryDescription").value = category.description || "";
-        document.getElementById("categoryImage").value = ""; // file input can't be set for security
-        addEditModal.style.display = "block";
-    }
+        // Open Edit Modal
+        function openEditModal(category) {
+            document.getElementById("modalTitle").innerText = "Edit Kategori";
+            modalForm.action = "/admin/category/" + category.id;
+            document.getElementById("formMethod").value = "PUT";
+            document.getElementById("categoryId").value = category.id;
+            document.getElementById("categoryName").value = category.name || "";
+            document.getElementById("categoryDescription").value = category.description || "";
+            document.getElementById("categoryImage").value = ""; // file input can't be set for security
+            addEditModal.style.display = "block";
+        }
 
-    // Open Delete Modal
-    function openDeleteModal(id, name) {
-        document.getElementById("deleteMessage").innerText = 'Apakah Anda yakin ingin menghapus kategori "' + name + '"?';
-        deleteForm.action = "/admin/category/" + id;
-        deleteModal.style.display = "block";
-    }
+        // Open Delete Modal
+        function openDeleteModal(id, name) {
+            document.getElementById("deleteMessage").innerText = 'Apakah Anda yakin ingin menghapus kategori "' + name +
+                '"?';
+            deleteForm.action = "/admin/category/" + id;
+            deleteModal.style.display = "block";
+        }
 
-    // Close Modals
-    closeAddEditModal.onclick = function() {
-        addEditModal.style.display = "none";
-    }
-    closeDeleteModal.onclick = function() {
-        deleteModal.style.display = "none";
-    }
-    cancelDelete.onclick = function() {
-        deleteModal.style.display = "none";
-    }
-
-    window.onclick = function(event) {
-        if (event.target == addEditModal) {
+        // Close Modals
+        closeAddEditModal.onclick = function() {
             addEditModal.style.display = "none";
         }
-        if (event.target == deleteModal) {
+        closeDeleteModal.onclick = function() {
             deleteModal.style.display = "none";
         }
-    }
-</script>
+        cancelDelete.onclick = function() {
+            deleteModal.style.display = "none";
+        }
+
+        window.onclick = function(event) {
+            if (event.target == addEditModal) {
+                addEditModal.style.display = "none";
+            }
+            if (event.target == deleteModal) {
+                deleteModal.style.display = "none";
+            }
+        }
+    </script>
 @endpush
