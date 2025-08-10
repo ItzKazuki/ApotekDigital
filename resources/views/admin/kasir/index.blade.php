@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-    <h1 class="text-2xl font-semibold text-gray-700 mb-4">Daftar ningsih</h1>
+    <h1 class="text-2xl font-semibold text-gray-700 mb-4">Daftar kasir</h1>
 
     <!-- Alert sukses/error -->
     @if (session('success'))
@@ -77,31 +77,34 @@
                 <input type="hidden" name="_method" id="formMethod" value="POST">
                 <input type="hidden" name="id" id="kasirId">
                 <div class="mb-4">
-                    <label class="block text-sm font-medium text-gray-700">Nama</label>
-                    <input type="text" name="name" id="kasirName"
+                    <label class="block text-sm font-medium text-gray-700">Nama <span class="text-red-600">*</span></label>
+                    <input type="text" name="name" id="kasirName" required
                         class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
                         required />
                 </div>
                 <div class="mb-4">
-                    <label class="block text-sm font-medium text-gray-700">Email</label>
-                    <input type="email" name="email" id="kasirEmail"
+                    <label class="block text-sm font-medium text-gray-700">Email <span class="text-red-600">*</span></label>
+                    <input type="email" name="email" id="kasirEmail" required
                         class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
                         required />
                 </div>
                 <div class="mb-4">
-                    <label class="block text-sm font-medium text-gray-700">Telepon</label>
-                    <input type="text" name="phone" id="kasirPhone"
+                    <label class="block text-sm font-medium text-gray-700">Telepon <span
+                            class="text-red-600">*</span></label>
+                    <input type="tel" name="phone" id="kasirPhone" required
                         class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400" />
                 </div>
                 <div class="mb-4">
-                    <label class="block text-sm font-medium text-gray-700">Password</label>
-                    <input type="password" name="password" id="kasirPassword"
+                    <label class="block text-sm font-medium text-gray-700">Password <span id="passwordRequired"
+                            class="text-red-600">*</span></label>
+                    <input type="password" name="password" id="kasirPassword" required
                         class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
                         minlength="8" />
                 </div>
                 <div class="mb-4">
-                    <label class="block text-sm font-medium text-gray-700">Konfirmasi Password</label>
-                    <input type="password" name="password_confirmation" id="kasirPasswordConfirm"
+                    <label class="block text-sm font-medium text-gray-700">Konfirmasi Password <span
+                            id="confirmPasswordRequired" class="text-red-600">*</span></label>
+                    <input type="password" name="password_confirmation" id="kasirPasswordConfirm" required
                         class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
                         minlength="8" />
                 </div>
@@ -157,6 +160,13 @@
             document.getElementById("kasirPhone").value = "";
             document.getElementById("kasirPassword").value = "";
             document.getElementById("kasirPasswordConfirm").value = "";
+
+            // Saat tambah, password tetap required
+            document.getElementById("kasirPassword").setAttribute("required", "required");
+            document.getElementById("kasirPasswordConfirm").setAttribute("required", "required");
+            document.getElementById('passwordRequired').classList.remove('hidden')
+            document.getElementById('confirmPasswordRequired').classList.remove('hidden');
+
             addEditModal.style.display = "block";
         }
 
@@ -172,6 +182,11 @@
             document.getElementById("kasirPhone").value = user.phone || "";
             document.getElementById("kasirPassword").value = "";
             document.getElementById("kasirPasswordConfirm").value = "";
+            // Saat edit, password tidak required
+            document.getElementById("kasirPassword").removeAttribute("required");
+            document.getElementById("kasirPasswordConfirm").removeAttribute("required");
+            document.getElementById('passwordRequired').classList.add('hidden');
+            document.getElementById('confirmPasswordRequired').classList.add('hidden');
             addEditModal.style.display = "block";
         }
 
