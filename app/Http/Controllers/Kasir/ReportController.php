@@ -22,6 +22,7 @@ class ReportController extends Controller
     {
         $transactions = Transaction::with('member', 'kasir', 'transactionDetails')
             ->orderBy('transaction_date', 'desc')
+            ->whereDate('transaction_date', today())
             ->paginate(5);
 
         $cashToday = Transaction::whereDate('transaction_date', today())
@@ -104,7 +105,6 @@ class ReportController extends Controller
             $transactionsPerDay[] = $found ? $found->total_transactions : 0;
             $revenuePerDay[] = $found ? round($found->total_revenue / 1_000_000, 2) : 0;
         }
-
 
         // === Percentage Change ===
         if ($totalProfitYesterday > 0) {
