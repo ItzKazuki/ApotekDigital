@@ -2,7 +2,7 @@
 
 @section('content')
     <div class="container mx-auto p-6">
-        <h1 class="text-2xl font-semibold text-gray-700 mb-4">Daftar Transaksi</h1>
+        <h1 class="text-4xl font-semibold text-gray-700 mb-4">Daftar Transaksi</h1>
 
         <!-- Alert sukses/error -->
         @if (session('success'))
