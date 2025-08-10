@@ -117,14 +117,16 @@
                 <input type="hidden" name="_method" id="formMethod" value="POST">
                 <input type="hidden" name="id" id="memberId">
                 <div class="mb-4">
-                    <label class="block text-sm font-medium text-gray-700">Nama</label>
+                    <label class="block text-sm font-medium text-gray-700">Nama <span
+                            class="text-red-600">*</span></label>
                     <input type="text" name="name" id="memberName"
                         class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
                         required />
                 </div>
                 <div class="mb-4">
-                    <label class="block text-sm font-medium text-gray-700">Telepon</label>
-                    <input type="text" name="phone" id="memberPhone"
+                    <label class="block text-sm font-medium text-gray-700">Telepon <span
+                            class="text-red-600">*</span></label>
+                    <input type="tel" name="phone" id="memberPhone" required
                         class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400" />
                 </div>
                 <div class="flex justify-end">
