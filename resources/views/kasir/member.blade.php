@@ -81,6 +81,8 @@
 @endsection
 
 @push('scripts')
+    <script src="{{ asset('vendor/jsbarcode/JsBarcode.all.min.js') }}"></script>
+
     <script>
         // DOM elements
         const searchBtn = document.getElementById('searchBtn');
@@ -151,22 +153,32 @@
                 const member = searchMemberResponse.data.member;
 
                 if (searchMemberResponse.data.success && member) {
-                    // Display member card
+                    // Generate unique barcode ID
+                    const barcodeId = 'barcode-' + Date.now();
+
                     resultsDiv.innerHTML = `
-                        <div class="member-card bg-gradient-to-br from-yellow-600 to-indigo-700 rounded-2xl shadow-xl p-6 text-white w-full max-w-md mx-auto">
-                            <div class="flex justify-between items-center mb-6">
-                                <div class="flex items-center space-x-2">
-                                    <img src="{{ asset('static/images/logo-apotek-v2-darkmode.png') }}" alt="Logo" class="mx-auto h-15 w-auto">
+                        <div class="member-card bg-gradient-to-br from-yellow-600 to-indigo-700 rounded-2xl shadow-xl p-8 text-white w-full max-w-lg mx-auto">
+                            <div class="flex justify-between items-center mb-8">
+                                <div class="flex items-center space-x-3">
+                                    <img src="{{ asset('static/images/logo-apotek-v2-darkmode.png') }}" alt="Logo" class="mx-auto h-20 w-auto">
                                 </div>
-                                <span class="bg-yellow-800 text-white px-3 py-1 rounded-full text-xs">${parseInt(member.point)} pts</span>
+                                <span class="bg-yellow-800 text-white px-4 py-1 rounded-full text-sm">
+                                    ${parseInt(member.point)} point
+                                </span>
                             </div>
 
-                            <div class="mb-6">
-                                <h2 class="text-2xl font-bold mb-2">${member.name}</h2>
-                                <p class="text-yellow-100">${member.phone}</p>
+                            <div class="mb-6 flex justify-between items-center">
+                                <div>
+                                    <h2 class="text-3xl font-bold mb-2">${member.name}</h2>
+                                    <p class="text-yellow-100 text-lg">${member.phone}</p>
+                                </div>
+                                <div>
+                                    <svg id="${barcodeId}"></svg>
+                                </div>
                             </div>
 
-                            <div class="flex justify-between items-center text-sm">
+
+                            <div class="flex justify-between items-center text-base">
                                 <div>
                                     <p class="text-yellow-200">Sejak</p>
                                     <p class="font-medium">${new Date(member.created_at).toLocaleDateString('id-ID')}</p>
@@ -178,24 +190,34 @@
                             </div>
                         </div>
                     `;
+
+                    // Render barcode
+                    JsBarcode(`#${barcodeId}`, `${member.phone}`, {
+                        format: "CODE128",
+                        lineColor: "#000000", // hitam
+                        background: "transparent", // transparan
+                        width: 2,
+                        height: 50,
+                        displayValue: true,
+                        fontSize: 14
+                    });
                 } else {
-                    // Display not found message
-                    resultsDiv.innerHTML = `
-                        <div class="bg-white rounded-lg shadow p-6 text-center">
-                            <p class="text-gray-600">Member dengan nomor telepon tersebut tidak ditemukan.</p>
-                        </div>
-                    `;
+                    showNotFound();
                 }
             }).catch(error => {
                 console.error(error);
-                // Display not found message
-                resultsDiv.innerHTML = `
-                    <div class="bg-white rounded-lg shadow p-6 text-center">
-                        <p class="text-gray-600">Member dengan nomor telepon tersebut tidak ditemukan.</p>
-                    </div>
-                `;
-            })
+                showNotFound();
+            });
         }
+
+        function showNotFound() {
+            resultsDiv.innerHTML = `
+                <div class="bg-white rounded-lg shadow p-6 text-center">
+                    <p class="text-gray-600">Member dengan nomor telepon tersebut tidak ditemukan.</p>
+                </div>
+            `;
+        }
+
 
         searchBtn.addEventListener('click', () => checkMember());
 
