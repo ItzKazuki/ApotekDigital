@@ -5,19 +5,20 @@
         <h1 class="text-4xl font-semibold mb-6">Laporan Penjualan</h1>
 
         {{-- Filter Tanggal --}}
-        <form method="GET" class="mb-6 flex space-x-4">
+        <form method="GET" class="flex flex-col md:flex-row md:items-center md:space-x-4 space-y-2 md:space-y-0 mb-4">
             <input type="date" name="start_date" value="{{ $startDate }}"
                 class="border border-gray-300 p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
             <input type="date" name="end_date" value="{{ $endDate }}"
                 class="border border-gray-300 p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
             <button type="submit"
                 class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition">Filter</button>
-            <a href="{{ route('admin.report.download.pdf', ['start_at' => $startDate, 'end_at' => $endDate]) }}"
-                class="inline-flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-medium rounded-lg shadow-md transition">
-                <i class="fas fa-file-pdf"></i>
-                Download PDF
-            </a>
-
+            <div class="md:ml-auto">
+                <a href="{{ route('admin.report.download.pdf', ['start_at' => $startDate, 'end_at' => $endDate]) }}"
+                    class="inline-flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-medium rounded-lg shadow-md transition">
+                    <i class="fas fa-file-pdf"></i>
+                    Download PDF
+                </a>
+            </div>
         </form>
 
         {{-- Ringkasan --}}

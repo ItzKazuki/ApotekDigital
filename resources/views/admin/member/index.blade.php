@@ -26,10 +26,17 @@
             </div>
         @endif
 
-        <div class="flex justify-end mb-4">
-            <button id="openAddModal" class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700">Tambah
-                Member</button>
-        </div>
+        <!-- Filter -->
+        <form method="GET" action="{{ route('admin.member.index') }}"
+            class="flex flex-col md:flex-row md:items-center md:space-x-4 space-y-2 md:space-y-0 mb-4">
+            <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari member berdasarkan no telpon atau nama..."
+                class="w-full md:w-1/3 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400" />
+            <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">Filter</button>
+            <div class="md:ml-auto">
+                <button id="openAddModal" class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700">Tambah
+                    Member</button>
+            </div>
+        </form>
 
         <div class="overflow-x-auto bg-white rounded-xl shadow border border-gray-200">
             <table class="min-w-full divide-y divide-gray-200">

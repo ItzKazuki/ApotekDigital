@@ -10,11 +10,19 @@ class CategoryController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $categories = Category::paginate(10);
+        $query = Category::query();
+
+        if ($request->filled('search')) {
+            $query->where('name', 'like', '%' . $request->search . '%');
+        }
+
+        $categories = $query->paginate(10);
+
         return view('admin.category.index', compact('categories'));
     }
+
 
     /**
      * Show the form for creating a new resource.
@@ -87,7 +95,7 @@ class CategoryController extends Controller
      */
     public function destroy(Category $category)
     {
-        if($category->drugs()->count() > 0) {
+        if ($category->drugs()->count() > 0) {
             return redirect()->back()->with('error', 'Kategori tidak dapat dihapus karena masih memiliki obat.');
         }
 

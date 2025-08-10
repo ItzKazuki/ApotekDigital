@@ -7,9 +7,24 @@ use Illuminate\Http\Request;
 
 class KasirController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $kasir = User::where('role', 'kasir')->get();
+        $query = User::where('role', 'kasir');
+
+        if ($request->filled('status')) {
+            $query->where('status', $request->status === 'online');
+        }
+
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                    ->orWhere('phone', 'like', "%{$search}%");
+            });
+        }
+
+        $kasir = $query->paginate(10);
+
         return view('admin.kasir.index', compact('kasir'));
     }
 
