@@ -39,7 +39,7 @@
         <aside
             class="flex flex-col items-center bg-white w-16 md:w-20 lg:w-24 space-y-2 border-r border-gray-200 pt-6 h-screen fixed left-0 top-0">
             <a aria-label="Menu" href="{{ route('kasir.profile') }}"
-                class="flex flex-col items-center justify-center bg-[#f9d36b] w-20 h-20 rounded-full overflow-hidden shrink-0 mb-8">
+                class="flex flex-col items-center justify-center w-20 h-20 rounded-full overflow-hidden shrink-0 mb-8">
                 <img alt="Profile photo of user, circular" class="w-full h-full object-cover" height="80"
                     loading="lazy"
                     src="{{ auth()->user()->profile_image_url ? auth()->user()->profile_image_url : Avatar::create(auth()->user()->name)->toBase64() }}"
@@ -85,6 +85,8 @@
         </main>
         @yield('keranjang')
     </div>
+
+    @stack('modals')
 
     <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     @stack('scripts')
