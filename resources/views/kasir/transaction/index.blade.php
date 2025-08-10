@@ -11,20 +11,20 @@
         <div class="flex-1">
             <label class="block text-sm font-medium text-gray-700">Mulai Tanggal</label>
             <input type="date" name="start_date" value="{{ request('start_date') }}"
-                class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-yellow-500 focus:border-yellow-500 p-2">
         </div>
         <div class="flex-1">
             <label class="block text-sm font-medium text-gray-700">Sampai Tanggal</label>
             <input type="date" name="end_date" value="{{ request('end_date') }}"
-                class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-yellow-500 focus:border-yellow-500 p-2">
         </div>
         <div class="flex-1">
             <label class="block text-sm font-medium text-gray-700">Nama Member</label>
             <input type="text" name="member" placeholder="Cari member" value="{{ request('member') }}"
-                class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-yellow-500 focus:border-yellow-500 p-2">
         </div>
         <div class="flex items-end mt-4">
-            <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700">
+            <button type="submit" class="bg-yellow-600 text-white px-4 py-2 rounded-md hover:bg-yellow-700">
                 Filter
             </button>
             <a href="{{ route('kasir.transaction') }}"

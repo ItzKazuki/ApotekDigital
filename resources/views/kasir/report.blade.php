@@ -8,7 +8,7 @@
                 <div class="bg-white shadow rounded-lg px-4 py-2">
                     <span id="current-date" class="text-gray-600"></span>
                 </div>
-                <a href="{{ route('kasir.report.export.excel') }}" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                <a href="{{ route('kasir.report.export.excel') }}" class="px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition-colors">
                     <span class="hidden sm:inline">Export Laporan (EXCEL)</span>
                 </a>
             </div>

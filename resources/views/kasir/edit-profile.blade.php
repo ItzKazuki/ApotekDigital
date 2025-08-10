@@ -96,7 +96,7 @@
                 id="confirmPassword" name="confirmPassword" placeholder="Konfirmasi password baru" type="password" />
         </div>
         <div class="pt-4">
-            <button class="bg-gray-900 text-white font-semibold px-6 py-2 rounded hover:bg-gray-800" type="submit">
+            <button class="bg-yellow-600 text-white font-semibold px-6 py-2 rounded hover:bg-yellow-700" type="submit">
                 Simpan Perubahan
             </button>
         </div>
