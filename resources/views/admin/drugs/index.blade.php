@@ -62,7 +62,7 @@
                 </tr>
             </thead>
             <tbody class="bg-white divide-y divide-gray-200">
-                @foreach ($drugs as $drug)
+                @forelse ($drugs as $drug)
                     <tr>
                         <td class="px-6 py-4 text-sm text-gray-700">{{ $drug->name }}</td>
                         <td class="px-6 py-4 text-sm text-gray-700">
@@ -89,7 +89,13 @@
                                 onclick="openDeleteModal({{ $drug->id }}, '{{ addslashes($drug->name) }}')">Delete</button>
                         </td>
                     </tr>
-                @endforeach
+                @empty
+                    <tr>
+                        <td colspan="9" class="px-6 py-4 text-center text-sm text-gray-500">
+                            Tidak ada obat yang ditemukan.
+                        </td>
+                    </tr>
+                @endforelse
             </tbody>
         </table>
     </div>

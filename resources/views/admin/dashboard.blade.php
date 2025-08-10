@@ -5,7 +5,8 @@
 @endpush
 
 @section('content')
-    <h1 class="text-2xl font-semibold text-gray-700 mb-6">Dashboard</h1>
+    <h1 class="text-4xl font-semibold text-gray-700 mb-2">Dashboard</h1>
+    <h3 class="text-xl mb-6 text-gray-600">Hallo, {{ Auth::user()->name }}! Selamat datang di portal admin.</h3>
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         <!-- Total Penjualan Hari Ini -->
         <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-200">

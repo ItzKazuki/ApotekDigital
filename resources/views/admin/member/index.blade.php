@@ -26,7 +26,8 @@
     @endif
 
     <div class="flex justify-end mb-4">
-        <button id="openAddModal" class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700">Tambah Member</button>
+        <button id="openAddModal" class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700">Tambah
+            Member</button>
     </div>
 
     <div class="overflow-x-auto bg-white rounded-xl shadow border border-gray-200">
@@ -41,11 +42,13 @@
                 </tr>
             </thead>
             <tbody class="bg-white divide-y divide-gray-200">
-                @foreach($members as $member)
+                @forelse ($members as $member)
                     <tr>
                         <td class="px-6 py-4 text-sm text-gray-700">{{ $member->name }}</td>
                         <td class="px-6 py-4 text-sm text-gray-700">{{ $member->phone }}</td>
-                        <td class="px-6 py-4 text-sm text-gray-700">{{ $member->expires_at ? \Carbon\Carbon::parse($member->expires_at)->format('d-m-Y') : '-' }}</td>
+                        <td class="px-6 py-4 text-sm text-gray-700">
+                            {{ $member->expires_at ? \Carbon\Carbon::parse($member->expires_at)->format('d-m-Y') : '-' }}
+                        </td>
                         <td class="px-6 py-4 text-sm text-gray-700">{{ number_format($member->point, 0, ',', '.') }}</td>
                         <td class="px-6 py-4 space-x-2">
                             <button class="px-3 py-1 bg-yellow-400 text-white rounded hover:bg-yellow-500 text-sm"
@@ -54,10 +57,16 @@
                                 onclick="openDeleteModal({{ $member->id }}, '{{ addslashes($member->name) }}')">Delete</button>
                         </td>
                     </tr>
-                @endforeach
+                @empty
+                    <tr>
+                        <td colspan="5" class="px-6 py-4 text-center text-sm text-gray-500">
+                            Tidak ada member yang ditemukan.
+                        </td>
+                    </tr>
+                @endforelse
             </tbody>
         </table>
-                <div class="my-4">
+        <div class="my-4">
             @if ($members->hasPages())
                 <nav class="flex justify-center">
                     <ul class="flex items-center space-x-1">
@@ -117,8 +126,7 @@
                 <input type="hidden" name="_method" id="formMethod" value="POST">
                 <input type="hidden" name="id" id="memberId">
                 <div class="mb-4">
-                    <label class="block text-sm font-medium text-gray-700">Nama <span
-                            class="text-red-600">*</span></label>
+                    <label class="block text-sm font-medium text-gray-700">Nama <span class="text-red-600">*</span></label>
                     <input type="text" name="name" id="memberName"
                         class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
                         required />
@@ -158,66 +166,66 @@
 @endpush
 
 @push('scripts')
-<script>
-    const addEditModal = document.getElementById("addEditModal");
-    const deleteModal = document.getElementById("deleteModal");
-    const closeAddEditModal = document.getElementById("closeAddEditModal");
-    const closeDeleteModal = document.getElementById("closeDeleteModal");
-    const cancelDelete = document.getElementById("cancelDelete");
-    const modalForm = document.getElementById("modalForm");
-    const deleteForm = document.getElementById("deleteForm");
+    <script>
+        const addEditModal = document.getElementById("addEditModal");
+        const deleteModal = document.getElementById("deleteModal");
+        const closeAddEditModal = document.getElementById("closeAddEditModal");
+        const closeDeleteModal = document.getElementById("closeDeleteModal");
+        const cancelDelete = document.getElementById("cancelDelete");
+        const modalForm = document.getElementById("modalForm");
+        const deleteForm = document.getElementById("deleteForm");
 
-    let isEditMode = false;
+        let isEditMode = false;
 
-    // Open Add Modal
-    document.getElementById("openAddModal").onclick = function() {
-        isEditMode = false;
-        document.getElementById("modalTitle").innerText = "Tambah Member";
-        modalForm.action = "{{ route('admin.member.store') }}";
-        document.getElementById("formMethod").value = "POST";
-        document.getElementById("memberId").value = "";
-        document.getElementById("memberName").value = "";
-        document.getElementById("memberPhone").value = "";
-        addEditModal.style.display = "block";
-    }
+        // Open Add Modal
+        document.getElementById("openAddModal").onclick = function() {
+            isEditMode = false;
+            document.getElementById("modalTitle").innerText = "Tambah Member";
+            modalForm.action = "{{ route('admin.member.store') }}";
+            document.getElementById("formMethod").value = "POST";
+            document.getElementById("memberId").value = "";
+            document.getElementById("memberName").value = "";
+            document.getElementById("memberPhone").value = "";
+            addEditModal.style.display = "block";
+        }
 
-    // Open Edit Modal
-    function openEditModal(member) {
-        isEditMode = true;
-        document.getElementById("modalTitle").innerText = "Edit Member";
-        modalForm.action = "/admin/member/" + member.id;
-        document.getElementById("formMethod").value = "PUT";
-        document.getElementById("memberId").value = member.id;
-        document.getElementById("memberName").value = member.name || "";
-        document.getElementById("memberPhone").value = member.phone || "";
-        addEditModal.style.display = "block";
-    }
+        // Open Edit Modal
+        function openEditModal(member) {
+            isEditMode = true;
+            document.getElementById("modalTitle").innerText = "Edit Member";
+            modalForm.action = "/admin/member/" + member.id;
+            document.getElementById("formMethod").value = "PUT";
+            document.getElementById("memberId").value = member.id;
+            document.getElementById("memberName").value = member.name || "";
+            document.getElementById("memberPhone").value = member.phone || "";
+            addEditModal.style.display = "block";
+        }
 
-    // Open Delete Modal
-    function openDeleteModal(id, name) {
-        document.getElementById("deleteMessage").innerText = `Apakah Anda yakin ingin menghapus member "${name}"?`;
-        deleteForm.action = "/admin/member/" + id;
-        deleteModal.style.display = "block";
-    }
+        // Open Delete Modal
+        function openDeleteModal(id, name) {
+            document.getElementById("deleteMessage").innerText = `Apakah Anda yakin ingin menghapus member "${name}"?`;
+            deleteForm.action = "/admin/member/" + id;
+            deleteModal.style.display = "block";
+        }
 
-    // Close Modals
-    closeAddEditModal.onclick = function() {
-        addEditModal.style.display = "none";
-    }
-    closeDeleteModal.onclick = function() {
-        deleteModal.style.display = "none";
-    }
-    cancelDelete.onclick = function() {
-        deleteModal.style.display = "none";
-    }
-
-    window.onclick = function(event) {
-        if (event.target == addEditModal) {
+        // Close Modals
+        closeAddEditModal.onclick = function() {
             addEditModal.style.display = "none";
         }
-        if (event.target == deleteModal) {
+        closeDeleteModal.onclick = function() {
             deleteModal.style.display = "none";
         }
-    }
-</script>
+        cancelDelete.onclick = function() {
+            deleteModal.style.display = "none";
+        }
+
+        window.onclick = function(event) {
+            if (event.target == addEditModal) {
+                addEditModal.style.display = "none";
+            }
+            if (event.target == deleteModal) {
+                deleteModal.style.display = "none";
+            }
+        }
+    </script>
 @endpush

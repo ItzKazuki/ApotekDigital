@@ -57,7 +57,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach ($transactions as $trx)
+                    @forelse ($transactions as $trx)
                         <tr class="hover:bg-gray-50 transition">
                             <td class="border-b p-4 text-sm text-gray-600">{{ $trx->invoice_number }}</td>
                             <td class="border-b p-4 text-sm text-gray-600">{{ $trx->transaction_date }}</td>
@@ -71,7 +71,13 @@
                             <td class="border-b p-4 text-sm text-gray-600">{{ ucfirst($trx->payment_method) }}</td>
                             <td class="border-b p-4 text-sm text-gray-600">{{ ucfirst($trx->status) }}</td>
                         </tr>
-                    @endforeach
+                    @empty
+                        <tr>
+                            <td colspan="9" class="border-b p-4 text-sm text-gray-600">
+                                Tidak ada transaksi yang ditemukan.
+                            </td>
+                        </tr>
+                    @endforelse
                 </tbody>
             </table>
         </div>

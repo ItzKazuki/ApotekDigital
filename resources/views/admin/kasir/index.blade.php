@@ -42,7 +42,7 @@
                 </tr>
             </thead>
             <tbody class="bg-white divide-y divide-gray-200">
-                @foreach ($kasir as $user)
+                @forelse ($kasir as $user)
                     <tr>
                         <td class="px-6 py-4 text-sm text-gray-700">{{ $user->name }}</td>
                         <td class="px-6 py-4 text-sm text-gray-700">{{ $user->email }}</td>
@@ -60,7 +60,13 @@
                                 onclick="openDeleteModal({{ $user->id }}, '{{ addslashes($user->name) }}')">Delete</button>
                         </td>
                     </tr>
-                @endforeach
+                @empty
+                    <tr>
+                        <td colspan="5" class="px-6 py-4 text-center text-sm text-gray-500">
+                            Tidak ada kasir yang ditemukan.
+                        </td>
+                    </tr>
+                @endforelse
             </tbody>
         </table>
     </div>

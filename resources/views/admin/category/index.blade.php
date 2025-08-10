@@ -45,7 +45,7 @@
                 </tr>
             </thead>
             <tbody class="bg-white divide-y divide-gray-200">
-                @foreach ($categories as $category)
+                @forelse ($categories as $category)
                     <tr>
                         <td class="px-6 py-4 text-sm text-gray-700">{{ $category->id }}</td>
                         <td class="px-6 py-4 text-sm text-gray-700">
@@ -66,7 +66,13 @@
                                 onclick="openDeleteModal({{ $category->id }}, '{{ addslashes($category->name) }}')">Delete</button>
                         </td>
                     </tr>
-                @endforeach
+                @empty
+                    <tr>
+                        <td colspan="6" class="px-6 py-4 text-center text-sm text-gray-500">
+                            Tidak ada kategori yang ditemukan.
+                        </td>
+                    </tr>
+                @endforelse
             </tbody>
         </table>
         <div class="my-4">
