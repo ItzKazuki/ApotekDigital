@@ -108,13 +108,15 @@
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div>
                         <div class="mb-4">
-                            <label class="block text-sm font-medium text-gray-700">Nama Produk</label>
+                            <label class="block text-sm font-medium text-gray-700">Nama Produk <span
+                                    class="text-red-600">*</span></label>
                             <input type="text" name="name" id="productName"
                                 class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
                                 required />
                         </div>
                         <div class="mb-4">
-                            <label class="block text-sm font-medium text-gray-700">Kategori</label>
+                            <label class="block text-sm font-medium text-gray-700">Kategori <span
+                                    class="text-red-600">*</span></label>
                             <select name="category_id" id="productCategory"
                                 class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
                                 required>
@@ -125,7 +127,8 @@
                             </select>
                         </div>
                         <div class="mb-4">
-                            <label class="block text-sm font-medium text-gray-700">Stok</label>
+                            <label class="block text-sm font-medium text-gray-700">Stok <span
+                                    class="text-red-600">*</span></label>
                             <input type="number" name="quantity" id="productStock"
                                 class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
                                 required />
@@ -134,26 +137,32 @@
 
                     <div>
                         <div class="mb-4">
-                            <label class="block text-sm font-medium text-gray-700">Harga Jual</label>
+                            <label class="block text-sm font-medium text-gray-700">Harga Jual <span
+                                    class="text-red-600">*</span></label>
                             <input type="number" name="price" id="productPrice"
                                 class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
                                 required />
                         </div>
                         <div class="mb-4">
-                            <label class="block text-sm font-medium text-gray-700">Harga Beli</label>
+                            <label class="block text-sm font-medium text-gray-700">Harga Beli <span
+                                    class="text-red-600">*</span></label>
                             <input type="number" name="purchase_price" id="productPurchasePrice"
-                                class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400" />
+                                class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
+                                required />
                         </div>
                         <div class="mb-4">
-                            <label class="block text-sm font-medium text-gray-700">Modal</label>
+                            <label class="block text-sm font-medium text-gray-700">Modal <span
+                                    class="text-red-600">*</span></label>
                             <input type="number" name="modal" id="productModal"
-                                class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400" />
+                                class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
+                                required />
                         </div>
                     </div>
 
                     <div>
                         <div class="mb-4">
-                            <label class="block text-sm font-medium text-gray-700">Expired</label>
+                            <label class="block text-sm font-medium text-gray-700">Expired <span
+                                    class="text-red-600">*</span></label>
                             <input type="date" name="expired_at" id="productExpired"
                                 class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400" />
                         </div>
@@ -165,9 +174,10 @@
                         </div>
                         <div class="mb-4">
                             <label for="packagingType" class="block text-sm font-medium text-gray-700 mb-1">Jenis
-                                Kemasan</label>
+                                Kemasan <span class="text-red-600">*</span></label>
                             <select id="packagingType" name="packaging_types"
-                                class="block w-full border-gray-300 rounded-md shadow-sm text-sm px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400">
+                                class="block w-full border-gray-300 rounded-md shadow-sm text-sm px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                                required>
                                 <option value="">-- Pilih Jenis Kemasan --</option>
                                 <option value="strip">Strip / Blister</option>
                                 <option value="botol">Botol</option>
@@ -190,7 +200,8 @@
                                 class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"></textarea>
                         </div>
                         <div class="mb-4">
-                            <label class="block text-sm font-medium text-gray-700">Gambar</label>
+                            <label class="block text-sm font-medium text-gray-700">Gambar <span
+                                    class="text-red-600">*</span></label>
                             <input type="file" name="image" id="productImage"
                                 class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400" />
                         </div>
@@ -333,12 +344,15 @@
             document.getElementById("productDescription").value = "";
             document.getElementById("productImage").value = "";
             document.getElementById("packagingType").value = "";
+            document.getElementById("productExpired").value = "";
+            document.getElementById("productBarcode").value = "";
+            document.getElementById("packagingType").value = "";
+            document.getElementById("productBarcode").readOnly = false;
             addEditModal.style.display = "block";
         }
 
         // Open Edit Modal
         function openEditModal(drug) {
-            console.log(drug);
             isEditMode = true;
             document.getElementById("modalTitle").innerText = "Edit Obat";
             modalForm.action = "/admin/drug/" + drug.id;
@@ -346,15 +360,16 @@
             document.getElementById("drugId").value = drug.id;
             document.getElementById("productName").value = drug.name || "";
             document.getElementById("productCategory").value = drug.category_id || "";
-            document.getElementById("productStock").value = parseInt(drug.stock) || "";
+            document.getElementById("productStock").value = parseInt(drug.stock) || 0;
             document.getElementById("productPrice").value = parseInt(drug.price) || "";
             document.getElementById("productPurchasePrice").value = parseInt(drug.purchase_price) || "";
-            document.getElementById("productModal").value = parseInt(drug.purchase_price) * parseInt(drug.stock) || "";
+            document.getElementById("productModal").value = parseInt(drug.modal) || "";
             document.getElementById("productDescription").value = drug.description || "";
             document.getElementById("productExpired").value = drug.expired_at ? drug.expired_at.substring(0, 10) : "";
             document.getElementById("productBarcode").value = drug.barcode || "";
             document.getElementById("packagingType").value = drug.packaging_types || "";
             document.getElementById("productImage").value = ""; // clear file input for edit
+            document.getElementById("productBarcode").readOnly = true;
             addEditModal.style.display = "block";
         }
 
@@ -389,6 +404,25 @@
         document.getElementById("productBarcode").addEventListener("keydown", function(e) {
             if (e.key === "Enter") {
                 e.preventDefault();
+            }
+        });
+
+        // Event klik di input barcode saat edit → konfirmasi
+        document.getElementById("productBarcode").addEventListener("click", function() {
+            if (isEditMode && this.readOnly) {
+                Swal.fire({
+                    title: 'Ubah Barcode?',
+                    text: 'Barcode akan berubah, barcode lama tidak akan valid. Lanjutkan?',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Ya, ubah',
+                    cancelButtonText: 'Batal'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        this.readOnly = false;
+                        this.focus();
+                    }
+                });
             }
         });
     </script>
