@@ -94,14 +94,18 @@
 <table>
     <thead>
         <tr>
+            <th>No.</th>
+            <th>No Invoice</th>
             <th>Tanggal</th>
-            <th>Total</th>
+            <th>Total Belanja</th>
             <th>Metode Pembayaran</th>
         </tr>
     </thead>
     <tbody>
-        @foreach ($transactions as $t)
+        @foreach ($transactions as $key => $t)
             <tr>
+                <td>{{ $key + 1 }}.</td>
+                <td>{{ $t->invoice_number }}</td>
                 <td>{{ $t->transaction_date }}</td>
                 <td>Rp {{ number_format($t->total, 0, ',', '.') }}</td>
                 <td>{{ ucfirst($t->payment_method) }}</td>
