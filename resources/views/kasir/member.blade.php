@@ -79,6 +79,7 @@
         </div>
     </div>
 @endsection
+
 @push('scripts')
     <script>
         // DOM elements
@@ -89,6 +90,11 @@
         const addMemberModal = document.getElementById('addMemberModal');
         const closeModalBtn = document.getElementById('closeModalBtn');
         const memberForm = document.getElementById('memberForm');
+        const allowedChars = /^[0-9A-Za-z\-\_]+$/; // karakter yang diizinkan
+        // Regex: mulai dari 08 + 8-11 digit angka setelahnya = total 10–13 digit
+        const phoneRegex = /^08\d{8,11}$/;
+        let barcode = '';
+        let scanTimeout;
 
         // Toggle modal function
         function toggleModal(show) {
@@ -105,7 +111,36 @@
         addMemberBtn.addEventListener('click', () => toggleModal(true));
         closeModalBtn.addEventListener('click', () => toggleModal(false));
 
-        searchBtn.addEventListener('click', () => {
+
+        document.addEventListener('keydown', function(e) {
+            if (scanTimeout) clearTimeout(scanTimeout);
+
+            if (e.key === 'Enter') {
+                if (barcode.length > 0) {
+                    // if barcode scan phone number for member
+                    // ✅ Cek apakah barcode adalah nomor telepon
+                    if (phoneRegex.test(barcode)) {
+                        // Set value input nomor telepon
+                        phoneInput.value = barcode;
+                        // Opsional: langsung trigger pencarian member
+                        checkMember();
+                        barcode = '';
+                        return; // Stop, jangan lanjut ke proses tambah produk
+                    }
+
+                    barcode = '';
+                }
+            } else {
+                // Filter hanya karakter yang diizinkan
+                if (allowedChars.test(e.key)) {
+                    barcode += e.key;
+                }
+            }
+
+            scanTimeout = setTimeout(() => barcode = '', 300);
+        });
+
+        function checkMember() {
             const phone = phoneInput.value.trim();
             if (!phone) return;
 
@@ -118,38 +153,38 @@
                 if (searchMemberResponse.data.success && member) {
                     // Display member card
                     resultsDiv.innerHTML = `
-                    <div class="member-card bg-gradient-to-br from-yellow-600 to-indigo-700 rounded-2xl shadow-xl p-6 text-white w-full max-w-md mx-auto">
-                        <div class="flex justify-between items-center mb-6">
-                            <div class="flex items-center space-x-2">
-                                <img src="{{ asset('static/images/logo-apotek-v2-darkmode.png') }}" alt="Logo" class="mx-auto h-15 w-auto">
+                        <div class="member-card bg-gradient-to-br from-yellow-600 to-indigo-700 rounded-2xl shadow-xl p-6 text-white w-full max-w-md mx-auto">
+                            <div class="flex justify-between items-center mb-6">
+                                <div class="flex items-center space-x-2">
+                                    <img src="{{ asset('static/images/logo-apotek-v2-darkmode.png') }}" alt="Logo" class="mx-auto h-15 w-auto">
+                                </div>
+                                <span class="bg-yellow-800 text-white px-3 py-1 rounded-full text-xs">${parseInt(member.point)} pts</span>
                             </div>
-                            <span class="bg-yellow-800 text-white px-3 py-1 rounded-full text-xs">${parseInt(member.point)} pts</span>
-                        </div>
 
-                        <div class="mb-6">
-                            <h2 class="text-2xl font-bold mb-2">${member.name}</h2>
-                            <p class="text-yellow-100">${member.phone}</p>
-                        </div>
+                            <div class="mb-6">
+                                <h2 class="text-2xl font-bold mb-2">${member.name}</h2>
+                                <p class="text-yellow-100">${member.phone}</p>
+                            </div>
 
-                        <div class="flex justify-between items-center text-sm">
-                            <div>
-                                <p class="text-yellow-200">Sejak</p>
-                                <p class="font-medium">${new Date(member.created_at).toLocaleDateString('id-ID')}</p>
-                            </div>
-                            <div class="text-right">
-                                <p class="text-yellow-200">Kadaluarsa pada</p>
-                                <p class="font-medium">${new Date(member.expires_at).toLocaleDateString('id-ID')}</p>
+                            <div class="flex justify-between items-center text-sm">
+                                <div>
+                                    <p class="text-yellow-200">Sejak</p>
+                                    <p class="font-medium">${new Date(member.created_at).toLocaleDateString('id-ID')}</p>
+                                </div>
+                                <div class="text-right">
+                                    <p class="text-yellow-200">Kadaluarsa pada</p>
+                                    <p class="font-medium">${new Date(member.expires_at).toLocaleDateString('id-ID')}</p>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                `;
+                    `;
                 } else {
                     // Display not found message
                     resultsDiv.innerHTML = `
-                    <div class="bg-white rounded-lg shadow p-6 text-center">
-                        <p class="text-gray-600">Member dengan nomor telepon tersebut tidak ditemukan.</p>
-                    </div>
-                `;
+                        <div class="bg-white rounded-lg shadow p-6 text-center">
+                            <p class="text-gray-600">Member dengan nomor telepon tersebut tidak ditemukan.</p>
+                        </div>
+                    `;
                 }
             }).catch(error => {
                 console.error(error);
@@ -160,7 +195,9 @@
                     </div>
                 `;
             })
-        });
+        }
+
+        searchBtn.addEventListener('click', () => checkMember());
 
         // Form submission
         memberForm.addEventListener('submit', (e) => {
@@ -178,22 +215,22 @@
 
                 // Show success message
                 resultsDiv.innerHTML = `
-                <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative" role="alert">
-                    <strong class="font-bold">Berhasil!</strong>
-                    <span class="block sm:inline">Member baru (${newMember.name}) telah ditambahkan.</span>
-                </div>
-            `;
+                    <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative" role="alert">
+                        <strong class="font-bold">Berhasil!</strong>
+                        <span class="block sm:inline">Member baru (${newMember.name}) telah ditambahkan.</span>
+                    </div>
+                `;
             }).catch(error => {
                 console.error('Error creating member:', error);
                 memberForm.reset();
                 toggleModal(false);
 
                 resultsDiv.innerHTML = `
-                <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
-                    <strong class="font-bold">Error!</strong>
-                    <span class="block sm:inline">Gagal menambahkan member baru. ${error.response?.data?.message || error.message} Silakan coba lagi.</span>
-                </div>
-            `;
+                    <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+                        <strong class="font-bold">Error!</strong>
+                        <span class="block sm:inline">Gagal menambahkan member baru. ${error.response?.data?.message || error.message} Silakan coba lagi.</span>
+                    </div>
+                `;
             });
         });
     </script>
