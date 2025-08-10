@@ -26,6 +26,7 @@ class User extends Authenticatable
         'role',
         'phone',
         'is_logged_in',
+        'profile_image',
     ];
 
     /**
@@ -66,7 +67,7 @@ class User extends Authenticatable
      */
     public function getProfileImageUrlAttribute(): string | null
     {
-        return $this->image ? asset('storage/' . $this->image) : null;
+        return $this->profile_image ? asset('storage/' . $this->profile_image) : null;
     }
 
     /**
