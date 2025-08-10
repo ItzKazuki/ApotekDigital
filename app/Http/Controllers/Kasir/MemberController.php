@@ -26,7 +26,7 @@ class MemberController extends Controller
             'expires_at' => now()->addMonth(),
             'point' => $request->point ?? 0,
         ]);
-        
+
         return response()->json([
             'success' => true,
             'member' => $member
@@ -49,7 +49,7 @@ class MemberController extends Controller
 
         return response()->json([
             'success' => true,
-            'member' => $member
+            'member' => $member->makeHidden(['id', 'updated_at'])
         ]);
     }
 }
