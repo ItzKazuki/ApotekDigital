@@ -1,2 +1,13 @@
 @import "tailwindcss";
 @source "../views";
+
+@layer utilities {
+  /* Untuk semua browser */
+  .scrollbar-hidden {
+    -ms-overflow-style: none; /* IE dan Edge */
+    scrollbar-width: none; /* Firefox */
+  }
+  .scrollbar-hidden::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, Opera */
+  }
+}
