@@ -44,7 +44,7 @@
     <!-- Menu Items Grid -->
     <div class="overflow-y-auto" style="max-height: 600px;">
         <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            @foreach ($drugs as $drug)
+            @forelse ($drugs as $drug)
                 @php
                     $expiredDate = Carbon::parse($drug->expired_at);
                     $today = Carbon::today();
@@ -115,7 +115,12 @@
                         Pilih Obat
                     </button>
                 </article>
-            @endforeach
+            @empty
+                <div class="col-span-full text-center text-gray-500 py-10">
+                    <i class="fas fa-pills text-4xl mb-3"></i>
+                    <p class="font-semibold">Obat tidak tersedia</p>
+                </div>
+            @endforelse
         </section>
 
     </div>
@@ -190,7 +195,7 @@
                             Pilih
                         </option>
                         @foreach ($paymentAvailable as $payment)
-                        <option value="{{ $payment }}">{{ ucwords($payment) }}</option>
+                            <option value="{{ $payment }}">{{ ucwords($payment) }}</option>
                         @endforeach
                     </select>
                 </div>
@@ -369,7 +374,7 @@
                 text: 'Keranjang Anda telah dikosongkan karena tidak ada aktivitas.',
                 icon: 'info',
                 confirmButtonText: 'OK',
-                timer: 5000,
+                timer: 3000,
                 timerProgressBar: true,
                 didClose: () => {
                     clearCartItems();
@@ -452,7 +457,6 @@
                     const cartItems = Object.values(responseCartItems?.data?.cartItems || {});
 
                     // jika cart item nya 0 maka sembunyikan detailCartItems
-
                     if (cartItems.length >= 1) {
                         totalSection.innerHTML = `Rp${totalValue.toLocaleString('id-ID')}`;
                         detailCartItems.classList.remove('hidden');
@@ -724,26 +728,6 @@
         function clearCartItems() {
             axios.post("{{ route('kasir.cart.clearItems') }}")
                 .then(response => {
-                    if (response.data.success) {
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'Berhasil',
-                            text: response.data.message,
-                            confirmButtonText: 'OK',
-                            timer: 1000,
-                            timerProgressBar: true,
-                        });
-                    } else {
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Gagal',
-                            text: response.data.message,
-                            confirmButtonText: 'OK',
-                            timer: 1000,
-                            timerProgressBar: true,
-                        });
-                    }
-
                     fetchCartItems();
                 })
                 .catch(error => {
