@@ -55,7 +55,7 @@ class CategoryController extends Controller
         Category::create([
             'name' => $request->name,
             'description' => $request->description,
-            'image_path' => $request->file('image') ? $request->file('image')->store('categories', 'public') : null,
+            'image_path' => $request->file('image') ? $request->file('image')->store(Category::CATEGORY_IMAGE_PATH, 'public') : null,
         ]);
 
         return redirect()->route('admin.category.index')->with('success', 'Kategori berhasil ditambahkan.');
@@ -82,7 +82,7 @@ class CategoryController extends Controller
         ];
 
         if ($request->hasFile('image')) {
-            $updatedData['image_path'] = $request->file('image')->store('categories', 'public');
+            $updatedData['image_path'] = $request->file('image')->store(Category::CATEGORY_IMAGE_PATH, 'public');
         }
 
         $category->update($updatedData);

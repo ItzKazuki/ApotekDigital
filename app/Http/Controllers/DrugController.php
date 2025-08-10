@@ -71,7 +71,7 @@ class DrugController extends Controller
             'modal' => $request->input('modal', 0), // Default to 0 if not provided
             'stock' => $request->input('quantity', 0), // Default to 0 if not provided
             'category_id' => $request->input('category_id'), // Ensure category_id is provided
-            'image_path' => $request->file('image') ? $request->file('image')->store('images', 'public') : null,
+            'image_path' => $request->file('image') ? $request->file('image')->store(Drug::DRUG_IMAGE_PATH, 'public') : null,
             'expired_at' => $request->input('expired_at') ? now()->parse($request->input('expired_at')) : null,
             'barcode' => $request->input('barcode', null), // Allow barcode to be
             'packaging_types' => $request->input('packaging_types')
@@ -131,7 +131,7 @@ class DrugController extends Controller
             if ($drug->image_path) {
                 Storage::disk('public')->delete($drug->image_path);
             }
-            $data['image_path'] = $request->file('image')->store('images', 'public');
+            $data['image_path'] = $request->file('image')->store(Drug::DRUG_IMAGE_PATH, 'public');
         }
 
         // Update the drug instance with the validated data
