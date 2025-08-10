@@ -18,9 +18,19 @@ class TransactionController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $transactions = Transaction::with(['member', 'kasir'])->paginate(10);
+        $query = Transaction::with(['member', 'kasir']);
+
+        if ($request->filled('search')) {
+            $query->findByInvoice($request->search);
+        }
+
+        if ($request->filled('payment_status')) {
+            $query->where('status', $request->payment_status);
+        }
+
+        $transactions = $query->paginate(10);
 
         return view('admin.transaction.index', compact('transactions'));
     }

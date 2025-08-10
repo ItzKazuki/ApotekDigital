@@ -30,6 +30,18 @@
         class="flex flex-col md:flex-row md:items-center md:space-x-4 space-y-2 md:space-y-0 mb-4">
         <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari invoice transaksi..."
             class="w-full md:w-1/3 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400" />
+
+        <!-- Status Filter -->
+        <select name="payment_status"
+            class="w-full md:w-1/4 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400">
+            <option value="">Semua Status Pembayaran</option>
+            <option value="completed" {{ request('payment_status') === 'completed' ? 'selected' : '' }}>Pembayaran Lunas
+            </option>
+            <option value="pending" {{ request('payment_status') === 'pending' ? 'selected' : '' }}>Pembayaran Pending
+            </option>
+            <option value="canceled" {{ request('payment_status') === 'canceled' ? 'selected' : '' }}>Pembayaran Dibatalkan
+            </option>
+        </select>
         <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">Filter</button>
     </form>
 
@@ -44,17 +56,18 @@
                     <th class="px-6 py-3 text-left text-sm font-semibold text-gray-600">Uang</th>
                     <th class="px-6 py-3 text-left text-sm font-semibold text-gray-600">Kembalian</th>
                     <th class="px-6 py-3 text-left text-sm font-semibold text-gray-600">Status</th>
-                    {{-- <th class="px-6 py-3 text-left text-sm font-semibold text-gray-600">Aksi</th> --}}
+                    <th class="px-6 py-3 text-left text-sm font-semibold text-gray-600">Aksi</th>
                 </tr>
             </thead>
             <tbody class="bg-white divide-y divide-gray-200">
-                @foreach ($transactions as $transaction)
+                @forelse ($transactions as $transaction)
                     <tr>
                         <td class="px-6 py-4 text-sm text-gray-700">{{ $transaction->invoice_number }}</td>
                         <td class="px-6 py-4 text-sm text-gray-700">{{ $transaction->member->name ?? 'Non Member' }}</td>
                         <td class="px-6 py-4 text-sm text-gray-700">Rp.
                             {{ number_format($transaction->total, 0, ',', '.') }}</td>
-                        <td class="px-6 py-4 text-sm text-gray-700">Rp. {{ number_format($transaction->cash, 0, ',', '.') }}
+                        <td class="px-6 py-4 text-sm text-gray-700">Rp.
+                            {{ number_format($transaction->cash, 0, ',', '.') }}
                         </td>
                         <td class="px-6 py-4 text-sm text-gray-700">Rp.
                             {{ number_format($transaction->change, 0, ',', '.') }}</td>
@@ -72,11 +85,17 @@
                                 onclick="openDeleteModal({{ $transaction->id }}, '{{ addslashes($transaction->invoice_number) }}')">Delete</button>
                         </td>
                     </tr>
-                @endforeach
+                @empty
+                    <tr>
+                        <td colspan="7" class="px-6 py-4 text-center text-sm text-gray-500">
+                            Tidak ada transaksi yang ditemukan.
+                        </td>
+                    </tr>
+                @endforelse
             </tbody>
         </table>
-        <div class="my-4">
-            @if ($transactions->hasPages())
+        @if ($transactions->hasPages())
+            <div class="my-4">
                 <nav class="flex justify-center">
                     <ul class="flex items-center space-x-1">
                         {{-- Tombol Previous --}}
@@ -119,8 +138,8 @@
                         @endif
                     </ul>
                 </nav>
-            @endif
-        </div>
+            </div>
+        @endif
 
     </div>
 @endsection
