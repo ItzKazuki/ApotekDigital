@@ -35,17 +35,23 @@
     </form>
 
 
-    <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-        <!-- History Card 1 -->
+    <section class="grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-4 gap-6 sm:gap-8 p-4 sm:p-6">
         @foreach ($transactions as $transaction)
             <article
-                class="elegant-bg rounded-xl p-6 space-y-4 border border-gray-300 hover:shadow-lg transition cursor-pointer"
+                class="elegant-bg rounded-xl p-4 sm:p-6 space-y-4 border border-gray-300
+                   hover:shadow-lg transition cursor-pointer"
                 onclick="window.location='{{ route('kasir.transaction.show', $transaction->id) }}'">
-                <header class="flex justify-between items-center">
-                    <h2 class="text-xl font-bold">{{ $transaction->invoice_number }}</h2>
-                    <time datetime="2024-04-20T14:30"
-                        class="text-sm text-gray-600 font-mono">{{ $transaction->transaction_date->format('d M Y, H:i') }}</time>
+
+                <header class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-1">
+                    <h2 class="text-lg sm:text-xl font-bold break-words">
+                        {{ $transaction->invoice_number }}
+                    </h2>
+                    <time datetime="{{ $transaction->transaction_date }}"
+                        class="text-xs sm:text-sm text-gray-600 font-mono">
+                        {{ $transaction->transaction_date->format('d M Y, H:i') }}
+                    </time>
                 </header>
+
                 @php
                     $details = $transaction->transactionDetails;
                     $shownDetails = $details->take(2);
@@ -53,33 +59,41 @@
                 @endphp
 
                 <ul
-                    class="space-y-2 max-h-40 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-100 rounded-md">
+                    class="space-y-2 max-h-32 sm:max-h-40 overflow-y-auto
+                       scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-100 rounded-md">
                     @foreach ($shownDetails as $transactionDetail)
-                        <li class="flex justify-between items-center">
-                            <span class="text-gray-800">{{ $transactionDetail->drug->name }}</span>
-                            <span class="text-gray-600">Rp{{ number_format($transactionDetail->subtotal, 0, ',', '.') }}
+                        <li class="flex justify-between items-center text-sm sm:text-base">
+                            <span class="text-gray-800 truncate">{{ $transactionDetail->drug->name }}</span>
+                            <span class="text-gray-600 whitespace-nowrap">
+                                Rp{{ number_format($transactionDetail->subtotal, 0, ',', '.') }}
                                 (x{{ $transactionDetail->quantity }})
                             </span>
                         </li>
                     @endforeach
 
                     @if ($remainingCount > 0)
-                        <li class="text-sm text-gray-500 italic">+{{ $remainingCount }} produk lainnya</li>
+                        <li class="text-xs sm:text-sm text-gray-500 italic">
+                            +{{ $remainingCount }} produk lainnya
+                        </li>
                     @endif
                 </ul>
 
-                <div class="border-t border-gray-300 pt-4 flex justify-between font-extrabold text-lg">
+                <div class="border-t border-gray-300 pt-4 flex justify-between font-extrabold text-base sm:text-lg">
                     <span>Total</span>
                     <span>Rp{{ number_format($transaction->total, 2, ',', '.') }}</span>
                 </div>
-                <div class="flex justify-between text-sm text-gray-700">
-                    <span>Member:</span>
-                    <span>{{ $transaction->member->name ?? 'Non Member' }} @if ($transaction->member)
-                            <span class="text-xs text-gray-500">({{ $transaction->member->phone }})</span>
+
+                <div class="flex justify-between text-xs sm:text-sm text-gray-700">
+                    <span>Member: </span>
+                    <span class="truncate">
+                        {{ $transaction->member->name ?? 'Non Member' }}
+                        @if ($transaction->member)
+                            <span class="text-gray-500">({{ $transaction->member->phone }})</span>
                         @endif
                     </span>
                 </div>
-                <div class="flex justify-between text-sm text-gray-700">
+
+                <div class="flex justify-between text-xs sm:text-sm text-gray-700">
                     <span>Kembalian:</span>
                     <span>Rp{{ number_format($transaction->change, 2, ',', '.') }}</span>
                 </div>
