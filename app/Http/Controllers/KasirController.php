@@ -9,7 +9,7 @@ class KasirController extends Controller
 {
     public function index(Request $request)
     {
-        $query = User::where('role', 'kasir');
+        $query = User::with('transactions.transactionDetails.drug')->where('role', 'kasir');
 
         if ($request->filled('status')) {
             $query->where('status', $request->status === 'online');
