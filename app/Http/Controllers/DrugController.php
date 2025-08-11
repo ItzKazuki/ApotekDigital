@@ -112,7 +112,8 @@ class DrugController extends Controller
             'category_id' => 'required|exists:categories,id',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,webp',
             'expired_at' => 'required|date',
-            'packaging_types' => 'required|in:strip,botol,ampul,sachet,vial,tube,suppositoria,inhaler,patch,box'
+            'packaging_types' => 'required|in:strip,botol,ampul,sachet,vial,tube,suppositoria,inhaler,patch,box',
+            'barcode' => 'nullable|string|unique:drugs,barcode,' . $drug->id,
         ]);
 
         $data = [
@@ -123,8 +124,12 @@ class DrugController extends Controller
             'stock' => $request->input('quantity', 0),
             'category_id' => $request->input('category_id'),
             'expired_at' => $request->input('expired_at') ? now()->parse($request->input('expired_at')) : null,
-            'packaging_types' => $request->input('packaging_types')
+            'packaging_types' => $request->input('packaging_types'),
         ];
+
+        if($request->filled('barcode')) {
+            $data['barcode'] = $request->barcode;
+        }
 
         if ($request->hasFile('image')) {
             // Delete old image if exists
