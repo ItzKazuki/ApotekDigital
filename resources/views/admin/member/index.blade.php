@@ -29,11 +29,13 @@
         <!-- Filter -->
         <form method="GET" action="{{ route('admin.member.index') }}"
             class="flex flex-col md:flex-row md:items-center md:space-x-4 space-y-2 md:space-y-0 mb-4">
-            <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari member berdasarkan no telpon atau nama..."
+            <input type="text" name="search" value="{{ request('search') }}"
+                placeholder="Cari member berdasarkan no telpon atau nama..."
                 class="w-full md:w-1/3 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400" />
             <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">Filter</button>
             <div class="md:ml-auto">
-                <button type="button" id="openAddModal" class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700">Tambah
+                <button type="button" id="openAddModal"
+                    class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700">Tambah
                     Member</button>
             </div>
         </form>
@@ -46,6 +48,7 @@
                         <th class="px-6 py-3 text-left text-sm font-semibold text-gray-600">Telepon</th>
                         <th class="px-6 py-3 text-left text-sm font-semibold text-gray-600">Expired</th>
                         <th class="px-6 py-3 text-left text-sm font-semibold text-gray-600">Point</th>
+                        <th class="px-6 py-3 text-left text-sm font-semibold text-gray-600">Total Transaksi</th>
                         <th class="px-6 py-3 text-left text-sm font-semibold text-gray-600">Aksi</th>
                     </tr>
                 </thead>
@@ -59,6 +62,7 @@
                             </td>
                             <td class="px-6 py-4 text-sm text-gray-700">{{ number_format($member->point, 0, ',', '.') }}
                             </td>
+                            <td class="px-6 py-4 text-sm text-gray-700">{{ $member->transactions->count() }}</td>
                             <td class="px-6 py-4 space-x-2">
                                 <button class="px-3 py-1 bg-yellow-400 text-white rounded hover:bg-yellow-500 text-sm"
                                     onclick='openEditModal(@json($member))'>Edit</button>
