@@ -68,8 +68,25 @@
                             </td>
                             <td class="border-b p-4 text-sm text-gray-600">Rp
                                 {{ number_format($trx->change, 0, ',', '.') }}</td>
-                            <td class="border-b p-4 text-sm text-gray-600">{{ ucfirst($trx->payment_method) }}</td>
-                            <td class="border-b p-4 text-sm text-gray-600">{{ ucfirst($trx->status) }}</td>
+                            <td class="border-b p-4 text-sm text-gray-600"><span
+                                    class="px-2 py-1 rounded-full text-xs font-medium bg-gray-300 text-gray-800">{{ ucfirst($trx->payment_method) }}</span>
+                            </td>
+                            <td class="border-b p-4 text-sm text-gray-600">
+                                @php
+                                    $statusColors = [
+                                        \App\Models\Transaction::STATUS_PAID => 'bg-green-100 text-green-800',
+                                        \App\Models\Transaction::STATUS_PENDING => 'bg-yellow-100 text-yellow-800',
+                                        \App\Models\Transaction::STATUS_CANCELED => 'bg-red-100 text-red-800',
+                                    ];
+
+                                    $color = $statusColors[$trx->status] ?? 'bg-gray-100 text-gray-800';
+                                    $label = ucfirst($trx->status);
+                                @endphp
+
+                                <span class="px-2 py-1 rounded-full text-xs font-medium {{ $color }}">
+                                    {{ $label }}
+                                </span>
+                            </td>
                         </tr>
                     @empty
                         <tr>

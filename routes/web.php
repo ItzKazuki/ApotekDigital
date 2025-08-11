@@ -40,6 +40,8 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => ['auth', Is
 
     Route::get('report/download/pdf', [ReportController::class, 'downloadPdf'])->name('report.download.pdf');
 
+    Route::get('transaction/{transaction}/{status}', [TransactionController::class, 'updatePaymentStatus'])->name('transaction.updatePaymentStatus');
+
     Route::resource('drug', DrugController::class);
     Route::resource('category', CategoryController::class);
     Route::resource('member', MemberController::class);

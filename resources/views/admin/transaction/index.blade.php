@@ -74,7 +74,22 @@
                             </td>
                             <td class="px-6 py-4 text-sm text-gray-700">Rp.
                                 {{ number_format($transaction->change, 0, ',', '.') }}</td>
-                            <td class="px-6 py-4 text-sm text-gray-700">{{ $transaction->status }}</td>
+                            <td class="px-6 py-4 text-sm">
+                                @php
+                                    $statusColors = [
+                                        \App\Models\Transaction::STATUS_PAID => 'bg-green-100 text-green-800',
+                                        \App\Models\Transaction::STATUS_PENDING => 'bg-yellow-100 text-yellow-800',
+                                        \App\Models\Transaction::STATUS_CANCELED => 'bg-red-100 text-red-800',
+                                    ];
+
+                                    $color = $statusColors[$transaction->status] ?? 'bg-gray-100 text-gray-800';
+                                    $label = ucfirst($transaction->status);
+                                @endphp
+
+                                <span class="px-2 py-1 rounded-full text-xs font-medium {{ $color }}">
+                                    {{ $label }}
+                                </span>
+                            </td>
                             <td class="px-6 py-4 space-x-2">
                                 <a href="{{ route('admin.transaction.show', $transaction->id) }}"><button
                                         class="px-3 py-1 bg-blue-400 text-white rounded hover:bg-blue-500 text-sm">Detail

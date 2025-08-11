@@ -153,4 +153,16 @@ class TransactionController extends Controller
             'data' => $response['data']
         ]);
     }
+
+    /**
+     * This method only admin can execute
+     */
+    public function updatePaymentStatus(Request $request, Transaction $transaction, string $status)
+    {
+        $transaction->update([
+            'status' => $status
+        ]);
+
+        return back()->with('success', 'Update pembayaran berhasil.');
+    }
 }
