@@ -10,6 +10,7 @@
         "barryvdh/laravel-dompdf": "^3.1",
         "joelwmale/laravel-cart": "^1.2",
         "laravel/framework": "^11.31",
+        "laravel/sanctum": "^4.0",
         "laravel/tinker": "^2.9",
         "laravolt/avatar": "^6.2",
         "phpoffice/phpspreadsheet": "^4.5",
