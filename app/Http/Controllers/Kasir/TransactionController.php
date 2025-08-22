@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Drug;
 use App\Models\Member;
 use App\Models\Transaction;
+use App\Services\Payments\PaymentGatewayInterface;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -42,7 +43,7 @@ class TransactionController extends Controller
         return view('kasir.transaction.index', compact('transactions')); // Adjust the view path as necessary
     }
 
-    public function store(Request $request)
+    public function store(Request $request, PaymentGatewayInterface $paymentService)
     {
         DB::beginTransaction();
         $member = null;
@@ -97,8 +98,19 @@ class TransactionController extends Controller
                 'total' => config('app.tax.enabled') ? $transaction->transactionDetails->sum('subtotal') + config('app.tax.value') : $transaction->transactionDetails->sum('subtotal'),
             ];
 
+            if ($request->metode_pembayaran == "qris") {
+                // use data to generate qris at midtrans
 
-            if ($request->cash) {
+                $midtrans = $paymentService->createTransaction([
+                    'transaction_id' => $transaction->id,
+                    'total_price' => $transactionData['total'],
+                ]);
+
+                $transactionData['payment_url'] = $midtrans['actions_url'];
+                $transactionData['cash'] = $midtrans['gross_amount'];
+            }
+
+            if ($request->cash && $request->metode_pembayaran != "qris") {
                 $transactionData['change'] = $request->cash - $transactionData['total'];
             }
 
@@ -113,17 +125,22 @@ class TransactionController extends Controller
 
                 $member->save();
 
-                if ($request->use_point && $request->use_point == true) {
-                    $pointToUse = min($member->point, $transactionData['total'] * 0.1);
-                    $remainingPrice = $transactionData['total'] - $pointToUse;
+                $promo = $member->checkPromoMember();
+
+                if ($request->use_member_promo && $request->use_member_promo == true && $promo) {
+                    $subtotal = $transaction->transactionDetails()->sum('subtotal');
+
+                    $discountValue = $subtotal * ($promo['discount'] / 100);
+                    $remainingPrice = $transactionData['total'] - $discountValue;
 
                     if ($request->cash < $remainingPrice) {
                         throw new Exception("Transaction failed, insufficient cash to cover the remaining price", 400);
                     }
 
+                    $transactionData['total'] = $remainingPrice;
                     $transactionData['change'] = $request->cash - $remainingPrice;
-                    $transactionData['point_usage'] = $pointToUse;
-                    $member->point -= $pointToUse;
+                    $transactionData['point_usage'] = $promo['used_point'];
+                    $member->point -= $promo['used_point'];
                     $member->save();
                 }
             }

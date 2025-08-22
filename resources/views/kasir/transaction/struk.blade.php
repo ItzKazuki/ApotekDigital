@@ -29,7 +29,7 @@
                 <tr>
                     <td class="qty">{{ $transactionDetail->quantity }}</td>
                     <td style="text-align: left;">{{ $transactionDetail->drug->name }}</td>
-                    <td>Rp. {{ number_format($transactionDetail->drug->price, 0, ',', '.') }}</td>
+                    <td>Rp. {{ number_format($transactionDetail->drug->price * $transactionDetail->quantity, 0, ',', '.') }}</td>
                 </tr>
             @endforeach
         </tbody>
@@ -39,6 +39,22 @@
         <div class="total">
             <span>Pajak ({{ config('app.tax.name') }})</span>
             <span>{{ number_format(config('app.tax.value'), 0, ',', '.') }}</span>
+        </div>
+    @endif
+    @if (config('promo.enabled') && $transaction->point_usage > 0)
+        @php
+            $found = array_filter(
+                config('promo.list'),
+                fn($promo) => (int) $promo['use_point'] === (int) $transaction->point_usage,
+            );
+
+            $subtotal = $transaction->transactionDetails()->sum('subtotal');
+            $promo = array_values($found)[0];
+            $promoValue = $subtotal * ($promo['discount'] / 100);
+        @endphp
+        <div class="total">
+            <span>Potongan Member ({{ $promo['discount'] }}%)</span>
+            <span>- {{ number_format($promoValue, 0, ',', '.') }}</span>
         </div>
     @endif
     <div class="total">
