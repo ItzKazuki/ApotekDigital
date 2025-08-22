@@ -49,7 +49,8 @@ class MemberController extends Controller
 
         return response()->json([
             'success' => true,
-            'member' => $member->makeHidden(['id', 'updated_at'])
+            'member' => $member->makeHidden(['id', 'updated_at']),
+            'promo' => config('promo.enabled') ? $member->checkPromoMember() : null
         ]);
     }
 }

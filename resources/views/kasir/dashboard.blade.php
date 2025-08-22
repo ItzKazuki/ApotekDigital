@@ -144,7 +144,7 @@
         </div>
         <!-- Summary -->
         <div class="border border-gray-300 rounded-md p-4 text-sm text-gray-900 hidden" id="detailCartItems">
-            <div class="flex justify-between mb-2">
+            <div class="flex justify-between mb-1">
                 <span>
                     Sub Total
                 </span>
@@ -152,12 +152,17 @@
                     Rp0
                 </span>
             </div>
+            {{-- Placeholder promo --}}
+            <div class="flex justify-between hidden mb-1" id="promoCartItems">
+                <span class="text-green-600" id="promoDescription"></span>
+                <span class="text-red-600" id="promoDiscount"></span>
+            </div>
             @if (config('app.tax.enabled'))
                 <div class="flex justify-between">
                     <span>
                         Pajak ({{ config('app.tax.name') }})
                     </span>
-                    <span id="totalPriceCartItems">
+                    <span>
                         Rp{{ number_format(config('app.tax.value'), 0, ',', '.') }}
                     </span>
                 </div>
@@ -472,7 +477,7 @@
                     const subtotalValue = responseCartItems.data.subtotal ?? 0;
                     subtotal.innerHTML = `Rp${subtotalValue.toLocaleString('id-ID')}`;
 
-                    const tax = {{ config('app.tax.value') }};
+                    const tax = {{ config('app.tax.enabled') ? config('app.tax.value') : 0 }};
                     // Remove dots from subtotalValue string and convert to integer
                     const subtotalClean = typeof subtotalValue === 'string' ?
                         parseInt(subtotalValue.replace(/\./g, ''), 10) :
@@ -506,8 +511,14 @@
 
                         return; // stop eksekusi
                     }
+
                     totalSection.innerHTML = `Rp${totalValue.toLocaleString('id-ID')}`;
                     detailCartItems.classList.remove('hidden');
+
+                    const memberData = JSON.parse(localStorage.getItem('memberData'));
+                    if (memberData) { // cek dulu ada atau tidak
+                        loadMemberData(memberData, subtotalClean, totalValue);
+                    }
 
                     cartContainer.innerHTML = ''; // Clear the existing content
                     cartItems.forEach(item => {
@@ -640,11 +651,42 @@
                 phone: phoneNumberMember
             }).then(memberResponse => {
                 const member = memberResponse.data.member;
+                const promo = memberResponse.data.promo;
+
                 if (memberResponse.data.success) {
+                    localStorage.setItem('memberData', JSON.stringify(memberResponse
+                        .data)); // set member to localstorage
+                    if (promo != null) {
+                        // get subtotal data
+                        const subtotal = document.getElementById('totalPriceCartItems').innerText;
+                        const totalSection = document.getElementById('totalPrice');
+
+                        // get subtotal (before tax)
+                        let subtotalValue = parseInt(subtotal.replace(/Rp|\./g, ''));
+                        let discountValue = subtotalValue * (promo.discount / 100);
+
+                        // get total (after tax)
+                        let totalValue = parseInt(totalSection.innerText.replace(/Rp|\./g, ''));
+
+                        let totalWithPromo = totalValue - discountValue;
+
+                        document.getElementById('promoDescription').textContent =
+                            `Potongan Member (${promo.discount}%)`;
+                        document.getElementById('promoDiscount').textContent =
+                            `-Rp${discountValue.toLocaleString('id-ID')}`;
+                        document.getElementById('promoCartItems').classList.remove('hidden');
+
+                        // change total
+                        totalSection.innerHTML = `Rp${totalWithPromo.toLocaleString('id-ID')}`;
+                    }
+
                     Swal.fire({
                         icon: 'success',
                         title: 'Berhasil',
-                        text: `Member dengan nomor ${phoneNumberMember} ditemukan dengan nama ${member.name}`,
+                        text: `Member ${member.name} (${phoneNumberMember}) berhasil ditemukan.`,
+                        confirmButtonText: 'OK',
+                        timer: 750,
+                        timerProgressBar: true,
                     });
 
                     // set phoneNumberInput to readonly and disable click on button search member
@@ -657,24 +699,38 @@
                     searchButton.disabled = true;
                     searchButton.classList.add('opacity-50', 'cursor-not-allowed');
 
-                    document.getElementById('phoneNumberMemberLabel').innerHTML =
-                        `Member (${member.name})
-                        <span class="text-xs text-gray-400">point: ${parseInt(member.point)}</span>
-                        <span class="relative group inline-block align-middle ml-1">
-                            <!-- Ikon Info -->
-                            <svg xmlns="http://www.w3.org/2000/svg"
-                                class="h-4 w-4 text-gray-500 cursor-pointer inline-block"
-                                fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M13 16h-1v-4h-1m1-4h.01M12 2a10 10 0 100 20 10 10 0 000-20z" />
-                            </svg>
-
-                            <!-- Tooltip -->
-                            <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 hidden group-hover:block
-                                        bg-gray-800 text-white text-xs px-2 py-1 rounded shadow z-10 whitespace-nowrap">
-                                Kadaluarsa pada ${new Date(member.expires_at).toLocaleDateString('id-ID')}
+                    document.getElementById('phoneNumberMemberLabel').innerHTML = `
+                        <div class="flex justify-between items-center w-full">
+                            <!-- Kiri: Teks Member + Ikon Info -->
+                            <div class="flex items-center space-x-1">
+                                <span>Member (${member.name})</span>
+                                <span class="text-xs text-gray-400">point: ${parseInt(member.point)}</span>
+                                <div class="relative group inline-flex items-center">
+                                    <svg xmlns="http://www.w3.org/2000/svg"
+                                        class="h-4 w-4 text-gray-500 cursor-pointer inline-block"
+                                        fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M13 16h-1v-4h-1m1-4h.01M12 2a10 10 0 100 20 10 10 0 000-20z" />
+                                    </svg>
+                                    <!-- Tooltip -->
+                                    <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 hidden group-hover:block
+                                                bg-gray-800 text-white text-xs px-2 py-1 rounded shadow z-10 whitespace-nowrap">
+                                        Kadaluarsa pada ${new Date(member.expires_at).toLocaleDateString('id-ID')}
+                                    </div>
+                                </div>
                             </div>
-                        </span>
+
+                            <!-- Kanan: Switch Gunakan Promo -->
+                            <label class="inline-flex items-center cursor-pointer">
+                                <input id="usePromoSwitch" type="checkbox" class="sr-only peer" checked>
+                                <div class="w-8 h-4 bg-gray-300 rounded-full peer peer-checked:bg-green-500 relative
+                                            after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white
+                                            after:rounded-full after:h-3 after:w-3 after:transition-all
+                                            peer-checked:after:translate-x-4">
+                                </div>
+                                <span class="ml-2 text-xs">Gunakan promo</span>
+                            </label>
+                        </div>
                     `;
 
                 } else {
@@ -695,11 +751,98 @@
             });
         }
 
+        function loadMemberData(memberData, subtotal, total) {
+            const phoneNumberMemberInput = document.getElementById('phoneNumberMember');
+            const totalSection = document.getElementById('totalPrice');
+            const member = memberData.member;
+            const promo = memberData.promo;
+
+            if (promo != null) {
+                // get subtotal data
+                let discountValue = subtotal * (promo.discount / 100);
+
+                let totalWithPromo = total - discountValue;
+
+                // console.log(memberData, subtotal, total, discountValue, totalWithPromo)
+
+                document.getElementById('promoDescription').textContent = `Potongan Member (${promo.discount}%)`;
+                document.getElementById('promoDiscount').textContent = `-Rp${discountValue.toLocaleString('id-ID')}`;
+                document.getElementById('promoCartItems').classList.remove('hidden');
+
+                // change total
+                totalSection.innerHTML = `Rp${totalWithPromo.toLocaleString('id-ID')}`;
+            }
+
+            // set phoneNumberInput to readonly and disable click on button search member
+            // Buat input readonly
+            phoneNumberMemberInput.value = member.phone;
+            phoneNumberMemberInput.onkeydown = null;
+            phoneNumberMemberInput.readOnly = true;
+
+            // Disable tombol cari
+            const searchButton = phoneNumberMemberInput
+                .nextElementSibling; // karena button ada di sebelah input
+            searchButton.disabled = true;
+            searchButton.classList.add('opacity-50', 'cursor-not-allowed');
+
+            document.getElementById('phoneNumberMemberLabel').innerHTML = `
+                        <div class="flex justify-between items-center w-full">
+                            <!-- Kiri: Teks Member + Ikon Info -->
+                            <div class="flex items-center space-x-1">
+                                <span>Member (${member.name.substring(0, 8)})</span>
+                                <span class="text-xs text-gray-400">point: ${parseInt(member.point)}</span>
+                                <div class="relative group inline-flex items-center">
+                                    <svg xmlns="http://www.w3.org/2000/svg"
+                                        class="h-4 w-4 text-gray-500 cursor-pointer inline-block"
+                                        fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M13 16h-1v-4h-1m1-4h.01M12 2a10 10 0 100 20 10 10 0 000-20z" />
+                                    </svg>
+                                    <!-- Tooltip -->
+                                    <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 hidden group-hover:block
+                                                bg-gray-800 text-white text-xs px-2 py-1 rounded shadow z-10 whitespace-nowrap">
+                                        Kadaluarsa pada ${new Date(member.expires_at).toLocaleDateString('id-ID')}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Kanan: Switch Gunakan Promo -->
+                            <label class="inline-flex items-center cursor-pointer">
+                                <input id="usePromoSwitch" type="checkbox" class="sr-only peer" checked>
+                                <div class="w-8 h-4 bg-gray-300 rounded-full peer peer-checked:bg-green-500 relative
+                                            after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white
+                                            after:rounded-full after:h-3 after:w-3 after:transition-all
+                                            peer-checked:after:translate-x-4">
+                                </div>
+                                <span class="ml-2 text-xs">Gunakan promo</span>
+                            </label>
+                        </div>
+                    `;
+        }
+
+        function clearMemberData() {
+            localStorage.removeItem('memberData');
+
+            const phoneNumberMemberInput = document.getElementById('phoneNumberMember');
+            phoneNumberMemberInput.value = '';
+            phoneNumberMemberInput.onkeydown = (event) => {
+                if (event.key === 'Enter') {
+                    event.preventDefault();
+                    checkMember();
+                }
+            };
+
+            phoneNumberMemberInput.readOnly = false;
+            document.getElementById('phoneNumberMemberLabel').innerHTML = 'Member (Nomor Telepon)';
+        }
+
         function createTransaction() {
             const cashInput = document.getElementById('cashInput');
             const cash = parseFloat(cashInput.value) || 0;
             const phoneNumberMember = document.getElementById('phoneNumberMember').value ?? null;
             const metodePembayaran = document.getElementById('metode-pembayaran').value;
+            let useMemberPromo = false;
+            let usedPoints = 0;
 
             // cek jika metode pembayaran tidak dipilih
             if (!metodePembayaran) {
@@ -726,12 +869,21 @@
                 return;
             }
 
+            if (phoneNumberMember) {
+                const memberData = JSON.parse(localStorage.getItem('memberData'));
+                useMemberPromo = document.getElementById('usePromoSwitch').checked;
+                usedPoints = memberData.promo.used_point;
+            }
+
             axios.post("{{ route('kasir.transaction.store') }}", {
                 cash: cash,
                 phone: phoneNumberMember,
-                metode_pembayaran: metodePembayaran
+                metode_pembayaran: metodePembayaran,
+                use_member_promo: useMemberPromo,
+                estimate_use_point: usedPoints
             }).then(transactionResponse => {
                 if (transactionResponse.data.success) {
+                    clearMemberData(); // clear first.
                     Swal.fire({
                         icon: 'success',
                         title: 'Berhasil',
@@ -764,6 +916,7 @@
             axios.post("{{ route('kasir.cart.clearItems') }}")
                 .then(response => {
                     fetchCartItems();
+                    clearMemberData();
                 })
                 .catch(error => {
                     console.error('Error clearing cart items:', error);

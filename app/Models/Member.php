@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use PhpParser\Node\Expr\Cast\Object_;
 
 class Member extends Model
 {
@@ -64,5 +65,24 @@ class Member extends Model
             'add_days' => $addDays,
             'point' => $totalPoints,
         ];
+    }
+
+    public function checkPromoMember(): array | null
+    {
+        $promoList = config('promo.list');
+        $bestPromo = null;
+
+        foreach ($promoList as $promoItem) {
+            if ($this->point >= $promoItem['min_point'] && $this->point >= $promoItem['use_point']) {
+                // Selalu pilih promo dengan min_point terbesar yang masih <= poin member
+                $bestPromo = [
+                    'discount' => $promoItem['discount'],
+                    'description' => $promoItem['description'],
+                    'used_point' => $promoItem['use_point']
+                ];
+            }
+        }
+
+        return $bestPromo;
     }
 }
