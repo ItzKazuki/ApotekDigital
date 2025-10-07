@@ -56,6 +56,7 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => ['auth', Is
 Route::group(['middleware' => 'auth', 'prefix' => 'kasir', 'as' => 'kasir.'], function () {
     Route::get('dashboard', [KasirDashboardController::class, 'index'])->name('index');
     Route::get('dashboard/transaction', [KasirTransactionController::class, 'index'])->name('transaction');
+    Route::post('dashboard/transaction/{transaction}/update-payment', [KasirTransactionController::class, 'checkStatus'])->name('transaction.update-payment');
 
     // profile routes
     Route::get('dashboard/profile', [KasirProfileController::class, 'index'])->name('profile');

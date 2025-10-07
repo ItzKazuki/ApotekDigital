@@ -98,22 +98,6 @@ class TransactionController extends Controller
                 'total' => config('app.tax.enabled') ? $transaction->transactionDetails->sum('subtotal') + config('app.tax.value') : $transaction->transactionDetails->sum('subtotal'),
             ];
 
-            if ($request->metode_pembayaran == "qris") {
-                // use data to generate qris at midtrans
-
-                $midtrans = $paymentService->createTransaction([
-                    'transaction_id' => $transaction->id,
-                    'total_price' => $transactionData['total'],
-                ]);
-
-                $transactionData['payment_url'] = $midtrans['actions_url'];
-                $transactionData['cash'] = $midtrans['gross_amount'];
-            }
-
-            if ($request->cash && $request->metode_pembayaran != "qris") {
-                $transactionData['change'] = $request->cash - $transactionData['total'];
-            }
-
             if (isset($member)) {
                 $transactionData['member_id'] = $member->id;
                 $rewards = $member->calculateMemberRewards($transactionData['total']);
@@ -133,7 +117,7 @@ class TransactionController extends Controller
                     $discountValue = $subtotal * ($promo['discount'] / 100);
                     $remainingPrice = $transactionData['total'] - $discountValue;
 
-                    if ($request->cash < $remainingPrice) {
+                    if ($request->metode_pembayaran == 'cash' && $request->cash < $remainingPrice) {
                         throw new Exception("Transaction failed, insufficient cash to cover the remaining price", 400);
                     }
 
@@ -143,6 +127,23 @@ class TransactionController extends Controller
                     $member->point -= $promo['used_point'];
                     $member->save();
                 }
+            }
+
+            if ($request->metode_pembayaran == "qris") {
+                // use data to generate qris at midtrans
+
+                $midtrans = $paymentService->createTransaction([
+                    'transaction_id' => $transaction->id,
+                    'total_price' => $transactionData['total'],
+                ]);
+
+                $transactionData['payment_url'] = $midtrans['actions_url'];
+                $transactionData['payment_expired'] = $midtrans['expiry_time'];
+                $transactionData['cash'] = $midtrans['gross_amount'];
+            }
+
+            if ($request->cash && $request->metode_pembayaran != "qris") {
+                $transactionData['change'] = $request->cash - $transactionData['total'];
             }
 
             $transaction->update($transactionData);
@@ -169,6 +170,47 @@ class TransactionController extends Controller
 
             return response()->json([
                 'error' => 'Transaksi gagal, coba ulang kembali nanti.',
+                'message' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function checkStatus(Transaction $transaction, PaymentGatewayInterface $paymentService)
+    {
+        try {
+            $status = $paymentService->checkPaymentStatus($transaction->id);
+
+            DB::beginTransaction();
+
+            if ($status['transaction_status'] == 'settlement') {
+                $transaction->update([
+                    'status' => Transaction::STATUS_PAID,
+                    'cash' => $status['gross_amount'],
+                ]);
+            } elseif ($status['transaction_status'] == 'pending') {
+                $transaction->update([
+                    'status' => Transaction::STATUS_PENDING,
+                ]);
+            } else {
+                // Kembalikan stok produk
+                foreach ($transaction->transactionDetails as $detail) {
+                    $drug = $detail->drug;
+                    $drug->stock += $detail->quantity;
+                    $drug->save();
+                }
+
+                $transaction->update([
+                    'status' => Transaction::STATUS_CANCELED,
+                ]);
+            }
+
+            DB::commit();
+
+            return response()->json($status);
+        } catch (Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'error' => 'Failed to check payment status',
                 'message' => $e->getMessage()
             ], 500);
         }

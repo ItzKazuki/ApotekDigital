@@ -228,7 +228,7 @@
                     id="changeOutput" readonly="" type="text" value="Rp0" />
             </div>
         </form>
-        <button onclick="createTransaction()"
+        <button onclick="createTransaction()" id="createTransactionBtn"
             class="bg-[#f9d36b] rounded-md py-3 font-extrabold text-black hover:bg-yellow-400" type="button">
             Bayar
         </button>
@@ -838,6 +838,8 @@
 
         function createTransaction() {
             const cashInput = document.getElementById('cashInput');
+            const createTransactionButton = document.getElementById('createTransactionBtn');
+
             const cash = parseFloat(cashInput.value) || 0;
             const phoneNumberMember = document.getElementById('phoneNumberMember').value ?? null;
             const metodePembayaran = document.getElementById('metode-pembayaran').value;
@@ -857,7 +859,7 @@
                 return;
             }
 
-            if (cash <= 0) {
+            if (metodePembayaran == 'tunai' && cash <= 0) {
                 Swal.fire({
                     icon: 'error',
                     title: 'Gagal',
@@ -869,10 +871,15 @@
                 return;
             }
 
+            document.getElementById('loadingProcessTransaction').style.display = 'flex';
+            createTransactionButton.disabled = true;
+            createTransactionButton.classList.add('cursor-not-allowed');
+            createTransactionButton.innerText = 'Memproses transaksi';
+
             if (phoneNumberMember) {
                 const memberData = JSON.parse(localStorage.getItem('memberData'));
                 useMemberPromo = document.getElementById('usePromoSwitch').checked;
-                usedPoints = memberData.promo.used_point;
+                usedPoints = memberData?.promo?.used_point || 0;
             }
 
             axios.post("{{ route('kasir.transaction.store') }}", {
@@ -884,16 +891,22 @@
             }).then(transactionResponse => {
                 if (transactionResponse.data.success) {
                     clearMemberData(); // clear first.
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Berhasil',
-                        text: transactionResponse.data.message,
-                        confirmButtonText: 'Lihat Transaksi',
-                    }).then(result => {
-                        if (result.isConfirmed) {
-                            window.location.href = transactionResponse.data.redirect;
-                        }
-                    });
+                    window.location.href = transactionResponse.data.redirect;
+
+                    // document.getElementById('loadingProcessTransaction').style.display = 'none';
+                    // createTransactionButton.disabled = false;
+                    // createTransactionButton.classList.remove('cursor-not-allowed');
+                    // createTransactionButton.innerText = 'Bayar Sekarang';
+                    // Swal.fire({
+                    //     icon: 'success',
+                    //     title: 'Berhasil',
+                    //     text: transactionResponse.data.message,
+                    //     confirmButtonText: 'Lihat Transaksi',
+                    // }).then(result => {
+                    //     if (result.isConfirmed) {
+                    //         window.location.href = transactionResponse.data.redirect;
+                    //     }
+                    // });
                 } else {
                     Swal.fire({
                         icon: 'error',
@@ -902,6 +915,11 @@
                     });
                 }
             }).catch(error => {
+                document.getElementById('loadingProcessTransaction').style.display = 'none';
+                createTransactionButton.disabled = false;
+                createTransactionButton.classList.remove('cursor-not-allowed');
+                createTransactionButton.innerText = 'Bayar Sekarang';
+
                 console.error('Error creating transaction:', error);
                 Swal.fire({
                     icon: 'error',

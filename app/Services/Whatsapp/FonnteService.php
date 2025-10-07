@@ -1,26 +1,28 @@
 <?php
 
-namespace App\Services;
+namespace App\Services\Whatsapp;
 
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Http;
 
-class FonnteService
+class FonnteService implements WhatsappNotificationInterface
 {
-    protected $device_token;
+    protected $baseUrl;
+    protected $auth;
 
     const ENDPOINTS = [
-        'send_message'  => 'https://api.fonnte.com/send',
+        'send_message'  => '/send',
     ];
 
     public function __construct()
     {
-        $this->device_token = env('FONNTE_WHATSAPP_TOKEN');
+        $this->baseUrl = env('FONNTE_WHATSAPP_URL', 'http://localhost:3000');
+        $this->auth = env('FONNTE_WHATSAPP_TOKEN');
     }
 
     protected function makeRequest($endpoint, $params = [])
     {
-        $token = $this->device_token ?? null;
+        $token = $this->auth ?? null;
 
         if (!$token) {
             return ['status' => false, 'error' => 'API token or device token is required.'];
@@ -30,10 +32,15 @@ class FonnteService
         $response = Http::withHeaders([
             'Authorization' => $token,
             'Content-Type'  => 'application/json', // Tambahkan header
-        ])->post($endpoint, $params);
+        ])->post($this->baseUrl . $endpoint, $params);
+
+        $json = $response->json();
 
         // Log respons untuk memudahkan debugging
-        Log::info('Fonnte API Response', ['endpoint' => $endpoint, 'response' => $response->json()]);
+        Log::info('WhatsApp Gateway API Response', [
+            'endpoint' => $this->baseUrl . $endpoint,
+            'response' => $json,
+        ]);
 
         if ($response->failed()) {
             return [
@@ -48,7 +55,7 @@ class FonnteService
         ];
     }
 
-    public function sendWhatsAppMessage($phoneNumber, $message)
+    public function sendWhatsAppMessage(string $phoneNumber, string $message): array
     {
         return $this->makeRequest(self::ENDPOINTS['send_message'], [
             'target'  => $phoneNumber,

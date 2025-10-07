@@ -18,14 +18,17 @@ class Transaction extends Model
         'cash',
         'change',
         'point_usage',
-        'reward_point'
+        'reward_point',
+        'payment_url',
+        'payment_expired',
+        'promo_member'
     ];
 
     public $timestamps = false;
 
     const STATUS_PAID = 'completed';
     const STATUS_PENDING = 'pending';
-    const STATUS_CANCELED = 'canceled';
+    const STATUS_CANCELED = 'cancelled';
 
     const PAYMENT_METHOD_CASH = 'tunai';
     const PAYMENT_METHOD_TRANSFER = 'transfer';

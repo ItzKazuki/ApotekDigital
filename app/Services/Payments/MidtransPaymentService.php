@@ -10,20 +10,27 @@ class MidtransPaymentService implements PaymentGatewayInterface
 {
     public function createTransaction(array $data)
     {
+        $expiredInMinute = (int) config('payment.midtrans.qris.expired_after');
+
         // Implement Midtrans logic here
         $res = Http::withHeaders([
             'Content-Type' => 'application/json',
             'Accept' => 'application/json'
         ])->withBasicAuth(config('payment.midtrans.server_key'), '')
-        ->post('https://api.sandbox.midtrans.com/v2/charge', [
-            'payment_type' => 'gopay',
-            'transaction_details' => [
-                'transaction_id' => $data['transaction_id'],
-                'gross_amount' => $data['total_price'],
-            ]
-        ]);
+            ->post('https://api.sandbox.midtrans.com/v2/charge', [
+                'payment_type' => 'gopay',
+                'transaction_details' => [
+                    'order_id' => $data['transaction_id'],
+                    'gross_amount' => $data['total_price'],
+                ],
+                'custom_expiry' => [
+                    'order_time' => now()->format('Y-m-d H:i:s O'),
+                    'expiry_duration' => $expiredInMinute,
+                    'unit' => 'minute'
+                ]
+            ]);
 
-        if($res->status() !== 200) {
+        if ($res->status() !== 200) {
             throw new \Exception('Failed to create transaction: ' . $res->body(), $res->status());
         }
 
@@ -40,7 +47,6 @@ class MidtransPaymentService implements PaymentGatewayInterface
             'expiry_time' => $response['expiry_time'] ?? null,
             'gross_amount' => $response['gross_amount'] ?? null,
         ];
-
     }
 
     public function checkPaymentStatus($transactionId)
@@ -50,9 +56,9 @@ class MidtransPaymentService implements PaymentGatewayInterface
             'Content-Type' => 'application/json',
             'Accept' => 'application/json'
         ])->withBasicAuth(config('payment.midtrans.server_key'), '')
-        ->get('https://api.sandbox.midtrans.com/v2/' . $transactionId . '/status');
+            ->get('https://api.sandbox.midtrans.com/v2/' . $transactionId . '/status');
 
-        if($res->status() !== 200) {
+        if ($res->status() !== 200) {
             throw new \Exception('Failed to check payment status: ' . $res->body(), $res->status());
         }
 
@@ -61,7 +67,7 @@ class MidtransPaymentService implements PaymentGatewayInterface
 
     public function handleCallback(Request $request)
     {
-        $signature = hash('sha512', $request->transaction_id . $request->status_code . $request->gross_amount . config('payment.midtrans.server_key') );
+        $signature = hash('sha512', $request->transaction_id . $request->status_code . $request->gross_amount . config('payment.midtrans.server_key'));
 
         if ($signature !== $request->signature_key) {
             return response()->json(['message' => 'Invalid signature'], 400);

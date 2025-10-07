@@ -34,6 +34,14 @@
 </head>
 
 <body class="bg-[#f5f7f9] font-sans text-gray-900">
+    <div id="loadingProcessTransaction"
+        class="fixed inset-0 z-[999999] flex items-center justify-center flex-col bg-white" style="display: none;">
+        <div class="h-16 w-16 animate-spin rounded-full border-4 border-solid border-yellow-600 border-t-transparent">
+        </div>
+        <p class="mt-4 font-bold text-xl">Memproses Transaksi</p>
+    </div>
+
+
     <div class="flex min-h-screen">
         <!-- Left Sidebar -->
         <aside
@@ -41,9 +49,7 @@
             <a aria-label="Menu" href="{{ route('kasir.profile') }}"
                 class="flex flex-col items-center justify-center w-20 h-20 rounded-full overflow-hidden shrink-0 mb-8">
                 <img alt="Profile photo of user, circular" class="w-full h-full object-cover" height="80"
-                    loading="lazy"
-                    src="{{ auth()->user()->profile_image_url }}"
-                    width="80" />
+                    loading="lazy" src="{{ auth()->user()->profile_image_url }}" width="80" />
             </a>
             <a href="{{ route('kasir.index') }}" aria-label="Menu"
                 class="flex flex-col items-center justify-center w-20 h-20 rounded-md font-bold text-xs

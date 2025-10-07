@@ -3,18 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\Transaction;
-use App\Services\FonnteService;
+use App\Services\Whatsapp\WhatsappNotificationInterface;
 use Illuminate\Http\Request;
 
 class TransactionController extends Controller
 {
-    protected $fonnteService;
-
-    public function __construct(FonnteService $fonnteService)
-    {
-        $this->fonnteService = $fonnteService;
-    }
-
     /**
      * Display a listing of the resource.
      */
@@ -36,51 +29,11 @@ class TransactionController extends Controller
     }
 
     /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
-    }
-
-    /**
      * Display the specified resource.
      */
     public function show(Transaction $transaction)
     {
         return view('admin.transaction.show', compact('transaction'));
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Transaction $transaction)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Transaction $transaction)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Transaction $transaction)
-    {
-        //
     }
 
     public function streamStruk(string $invoice)
@@ -94,7 +47,7 @@ class TransactionController extends Controller
         return view('layouts.struk', compact('transaction'));
     }
 
-    public function sendWhatsappMessage(Request $request)
+    public function sendWhatsappMessage(Request $request, WhatsappNotificationInterface $whatsAppGateway)
     {
         $request->validate([
             'phone'    => 'required|string',
@@ -136,7 +89,7 @@ class TransactionController extends Controller
             . "Kembalian: Rp {$kembalian}\n"
             . "Struk dapat diakses di sini:\n{$strukUrl}";
 
-        $response = $this->fonnteService->sendWhatsAppMessage($target, $message);
+        $response = $whatsAppGateway->sendWhatsAppMessage($target, $message);
 
         if (!$response['status'] || (isset($response['data']['status']) && !$response['data']['status'])) {
             $errorReason = $response['data']['reason'] ?? 'Unknown error occurred';

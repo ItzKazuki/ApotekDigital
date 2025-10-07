@@ -153,4 +153,6 @@ return [
     'struk' => [
         'show_cashier_name' => env('SHOW_CASHIER_NAME', true)
     ],
+
+    'thermal_printer_enabled' => env('THERMAL_PRINTER_ENABLED', false)
 ];
